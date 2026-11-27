@@ -1,0 +1,185 @@
+---
+/**
+ * 책의 목차에 해당하는 인덱스 메뉴.
+ *
+ * Artist는 기본적으로 접혀 있고, 아티스트 페이지에 들어가 있을 때만 펼쳐진다.
+ * 접고 펴는 데 details/summary를 써서 자바스크립트 없이 동작한다.
+ * 모바일에서는 아티스트 목록을 한 줄로 흘려 메뉴가 차지하는 높이를 줄인다.
+ */
+import { getCollection } from 'astro:content';
+import settings from '../../content/settings/settings.json';
+
+const artists = (await getCollection('artists')).sort(
+  (a, b) => a.data.no - b.data.no
+);
+
+const path = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const isArtistSection = path === '/artist' || path.startsWith('/artist/');
+const isContact = path === '/contact';
+
+const shopUrl = settings.shopUrl || '/';
+const shopIsExternal = /^https?:\/\//.test(shopUrl);
+
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+
+<nav class="index" aria-label="섹션">
+  <ol class="index-sections">
+    <li class="index-section">
+      <details class="artist-disclosure" open={isArtistSection}>
+        <summary class="index-link">
+          <span class="item-number">01</span>
+          <span class="index-name">Artist</span>
+        </summary>
+
+        <ol class="artist-list">
+          {
+            artists.map((artist) => (
+              <li class="artist-entry">
+                <a
+                  class="index-link index-link--nested"
+                  href={`/artist/${artist.id}`}
+                  aria-current={path === `/artist/${artist.id}` ? 'page' : undefined}
+                >
+                  <span class="item-number artist-number">{pad(artist.data.no)}</span>
+                  <span class="index-name">{artist.data.name}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ol>
+      </details>
+    </li>
+
+    <li class="index-section">
+      <a
+        class="index-link"
+        href={shopUrl}
+        target={shopIsExternal ? '_blank' : undefined}
+        rel={shopIsExternal ? 'noopener noreferrer' : undefined}
+      >
+        <span class="item-number">02</span>
+        <span class="index-name">Shop</span>
+      </a>
+    </li>
+
+    <li class="index-section">
+      <a
+        class="index-link"
+        href="/contact"
+        aria-current={isContact ? 'page' : undefined}
+      >
+        <span class="item-number">03</span>
+        <span class="index-name">Contact</span>
+      </a>
+    </li>
+  </ol>
+
+  <footer class="index-links">
+    {
+      settings.socials?.map((social) => (
+        <a href={social.url} target="_blank" rel="noopener noreferrer">
+          {social.label}
+        </a>
+      ))
+    }
+    <small class="index-copyright">© {new Date().getFullYear()} {settings.siteName}</small>
+  </footer>
+</nav>
+
+<style>
+  .index {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--gutter) * 1.2);
+  }
+
+  .index-link {
+    display: flex;
+    gap: 0.7em;
+    align-items: baseline;
+    padding: 1px 0;
+    cursor: pointer;
+  }
+
+  /* 번호에는 밑줄이 붙지 않는다. 이름에만 붙는다 */
+  .index-link:hover .index-name,
+  .index-link:focus-visible .index-name,
+  .index-link[aria-current='page'] .index-name {
+    text-decoration: underline;
+    text-underline-offset: 0.22em;
+    text-decoration-thickness: 0.5px;
+  }
+
+  .index-link:hover,
+  .index-link:focus-visible {
+    text-decoration: none;
+  }
+
+  .item-number {
+    flex: 0 0 auto;
+  }
+
+  /* 펼침 삼각형을 없앤다. 아이콘을 쓰지 않는다 */
+  .artist-disclosure > summary {
+    list-style: none;
+  }
+
+  .artist-disclosure > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .artist-list {
+    margin-top: 1px;
+    padding-left: 1.9em;
+  }
+
+  .artist-entry {
+    padding: 0;
+  }
+
+  .index-links {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .index-copyright {
+    font-size: inherit;
+  }
+
+  @media (max-width: 720px) {
+    .index {
+      gap: var(--gutter);
+    }
+
+    /* 아티스트 목록을 한 줄로 흘려 메뉴 높이를 줄인다.
+       번호는 숨기고 이름만 남긴다 */
+    .artist-list {
+      display: flex;
+      flex-wrap: wrap;
+      column-gap: 1.1em;
+      row-gap: 2px;
+      padding-left: 1.9em;
+    }
+
+    .artist-number {
+      display: none;
+    }
+
+    .index-link {
+      min-height: var(--tap-size);
+      align-items: center;
+    }
+
+    .artist-entry .index-link {
+      min-height: calc(var(--tap-size) - 6px);
+    }
+
+    .index-links {
+      flex-direction: row;
+      flex-wrap: wrap;
+      column-gap: 1.1em;
+    }
+  }
+</style>

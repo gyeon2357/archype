@@ -1,9 +1,9 @@
 ---
 import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
-import MetaBlock from '../../components/MetaBlock.astro';
-import IndexTable from '../../components/IndexTable.astro';
-import type { Column, Row } from '../../components/IndexTable.astro';
+import FactList from '../../components/FactList.astro';
+import RecordTable from '../../components/RecordTable.astro';
+import type { Column, Row } from '../../components/RecordTable.astro';
 
 export async function getStaticPaths() {
   const artists = await getCollection('artists');
@@ -18,9 +18,9 @@ const { Content } = await render(artist);
 const data = artist.data;
 
 const workColumns: Column[] = [
-  { key: 'year', label: 'Year', no: true },
+  { key: 'year', label: 'Year', isNumber: true },
   { key: 'title', label: 'Work' },
-  { key: 'type', label: 'Type', ital: true, dim: true, nowrap: true },
+  { key: 'type', label: 'Type', isClassifier: true, noWrap: true },
 ];
 
 const workRows: Row[] = [...data.works]
@@ -32,52 +32,107 @@ const workRows: Row[] = [...data.works]
 ---
 
 <Base title={data.name}>
-  <article>
-    <!-- 이름도 본문과 같은 크기로 둔다. 위계는 위치와 여백이 만든다. -->
-    <h1 class="block">{data.name}</h1>
+  <article class="artist">
+    <!-- 이름도 본문과 같은 크기로 둔다. 위계는 위치와 여백이 만든다 -->
+    <header class="content-block">
+      <h1>{data.name}</h1>
+    </header>
 
-    <MetaBlock
-      items={[
-        { label: 'No', value: String(data.no).padStart(2, '0') },
-        { label: 'Role', value: data.roles.join(', ') },
-        { label: 'Genre', value: data.genres.join(', ') },
-        { label: 'Since', value: data.since },
-        { label: 'Base', value: data.base },
-        ...data.links.map((link) => ({
-          label: link.label,
-          value: link.url.replace(/^https?:\/\//, ''),
-          url: link.url,
-        })),
-      ]}
-    />
+    <div class="artist-head">
+      <div class="artist-facts">
+        <FactList
+          facts={[
+            { label: 'No', value: String(data.no).padStart(2, '0') },
+            { label: 'Role', value: data.roles.join(', ') },
+            { label: 'Genre', value: data.genres.join(', ') },
+            { label: 'Since', value: data.since },
+            { label: 'Base', value: data.base },
+            ...data.links.map((link) => ({
+              label: link.label,
+              value: link.url.replace(/^https?:\/\//, ''),
+              url: link.url,
+            })),
+          ]}
+        />
+      </div>
 
-    <div class="block prose">
-      <Content />
+      <!-- 인물 사진 자리 -->
+      <figure class="artist-profile">
+        {
+          data.profileImage ? (
+            <img
+              src={data.profileImage}
+              alt={data.profileCaption ?? data.name}
+              loading="lazy"
+            />
+          ) : (
+            <div class="image-placeholder">
+              <span class="section-label">Profile</span>
+            </div>
+          )
+        }
+        {data.profileCaption && <figcaption>{data.profileCaption}</figcaption>}
+      </figure>
     </div>
+
+    <section class="content-block body-text">
+      <Content />
+    </section>
 
     {
       workRows.length > 0 && (
-        <section class="block">
-          <span class="label">Works</span>
-          <IndexTable columns={workColumns} rows={workRows} linkKey="title" />
+        <section class="content-block">
+          <h2 class="section-label">Works</h2>
+          <RecordTable columns={workColumns} rows={workRows} linkKey="title" />
         </section>
       )
     }
 
-    {
-      data.images.length > 0 && (
-        <section class="block">
-          <span class="label">Images</span>
-          <div class="gallery">
-            {data.images.map((image) => (
+    <!-- 무드 이미지 자리 -->
+    <section class="content-block">
+      <h2 class="section-label">Mood</h2>
+      {
+        data.moodImages.length > 0 ? (
+          <div class="image-grid">
+            {data.moodImages.map((image) => (
               <figure>
                 <img src={image.src} alt={image.caption ?? data.name} loading="lazy" />
                 {image.caption && <figcaption>{image.caption}</figcaption>}
               </figure>
             ))}
           </div>
-        </section>
-      )
-    }
+        ) : (
+          <div class="image-grid">
+            <div class="image-placeholder image-placeholder--wide">
+              <span class="section-label">Mood</span>
+            </div>
+          </div>
+        )
+      }
+    </section>
   </article>
 </Base>
+
+<style>
+  .artist-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 150px;
+    gap: var(--gutter);
+    align-items: start;
+    margin-bottom: calc(var(--gutter) * 2);
+  }
+
+  .artist-profile {
+    width: 150px;
+  }
+
+  @media (max-width: 720px) {
+    .artist-head {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .artist-profile {
+      width: 130px;
+    }
+  }
+</style>

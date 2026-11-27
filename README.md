@@ -1,108 +1,100 @@
 # ARCHYPE
 
-아티스트 인덱스와 아카이브. Astro + Tina CMS, 정적 사이트.
+아티스트 인덱스와 아카이브. Astro + Tina CMS로 만든 정적 사이트이고, Cloudflare Workers에 배포됩니다.
 
 ## 조판 원칙
 
-이 사이트는 글자 크기로 위계를 만들지 않습니다. `src/styles/type.css`에 크기가 두 개만 선언되어 있고, 세 번째를 추가하지 않는 것이 이 디자인의 전제입니다.
+`src/styles/type.css` 한 파일이 사이트 전체의 조판을 쥐고 있습니다. 세 가지 제약이 전제입니다.
 
-- `--fs: 12px` — 본문 겸 캡션. 한글 가독 하한을 고려한 값입니다.
-- `--fs-sm: 10.5px` — 라틴 전용 라벨·번호·메타데이터. 한글에는 쓰지 않습니다.
+**크기는 두 단계뿐입니다.** `--text-size: 12px`가 본문 겸 캡션이고, `--label-size: 10.5px`는 라틴 대문자 라벨과 번호에만 씁니다. 한글에는 작은 쪽을 쓰지 않습니다. 세 번째 크기를 만들지 않는 것이 이 디자인이 성립하는 조건입니다.
 
-위계는 대소문자(`.label`), 자간, 명도(`--ink-60`, `--ink-38`), 이탤릭(`.ital`), 여백으로만 만듭니다. 제목 태그도 본문과 같은 크기이고, 버튼은 `.btn`이 대괄호를 붙여 기능을 알립니다.
+**글자 색은 검정 하나입니다.** `--ink: #000`뿐이고 명도로 위계를 만들지 않습니다. 구분이 필요하면 대소문자(`.section-label`), 자간, 기울임(`.classifier`), 여백, 괘선으로 처리합니다.
 
-한글 조판에서 두 가지를 건드리지 마세요. `word-break: keep-all`은 한글이 단어 중간에서 잘리는 것을 막고, `line-height: 1.65`는 12px에서 읽히게 만드는 최소값입니다.
+**굵기도 하나입니다.** Pretendard Regular만 올라가 있어서 `font-synthesis: style`로 가짜 볼드를 막았습니다. `strong`과 `b`도 400으로 눌러 두었으니 마크다운에서 `**강조**`를 써도 본문과 같습니다.
 
 ### 서체
 
-Pretendard Regular 서브셋 한 종만 씁니다 (`public/fonts/`). 굵기가 하나뿐이라 위계를 굵기로 만들 수 없고, 그 제약이 이 사이트의 전제와 맞습니다.
+라틴은 브라우저가 가진 Helvetica로, 한글은 Pretendard로 떨어집니다. Helvetica에 한글 글리프가 없어서 폴백이 자연스럽게 갈리는 구조입니다.
 
-- 서브셋에 한글 2,780자가 들어 있습니다. 일상적인 범위는 덮지만 희귀 음절(예: `웱`)은 폴백 서체로 넘어가니, 아티스트명이나 상품명에서 어긋나는 글자가 보이면 해당 글자를 포함해 다시 서브셋하세요.
-- `font-synthesis: style` — 가짜 볼드는 막고 기울임 합성만 남겼습니다. `.ital`을 분류 표시 채널로 쓰기 때문입니다. 기계적으로 기울인 한글이 거슬리면 `none`으로 바꾸고 `.ital` 대신 자간과 명도로 그 채널을 대체하세요.
-- `strong`, `b`도 400으로 눌러 뒀습니다. 마크다운에서 `**강조**`를 써도 본문과 같은 굵기로 나옵니다.
+Pretendard 서브셋에는 한글 2,780자가 들어 있습니다. 희귀 음절(예: `웱`)은 시스템 서체로 넘어가니, 아티스트명이나 상품명에서 글자가 어긋나 보이면 그 글자를 포함해 다시 서브셋하세요.
 
 ## 구조
 
 ```
-content/            Tina가 읽고 쓰는 콘텐츠 (git에 그대로 커밋됨)
-  artists/*.md      아티스트 8명
-  products/*.md     상품
-  pages/*.md        Home 공지, Contact
-  settings/*.json   사이트 이름, SNS, 공용 주문 폼 링크
+content/            Tina가 읽고 쓰는 콘텐츠. git에 그대로 커밋됩니다
+  artists/*.md      아티스트 여덟 명
+  pages/*.md        Home 공지와 이미지, Contact
+  settings/*.json   사이트 이름, Shop 링크, SNS 링크
 src/
-  layouts/Base.astro        좌측 인덱스 + 본문. 모바일 하단 바 포함
+  layouts/Base.astro          2열 2행 격자. 1행은 사이트 이름, 2행은 메뉴와 본문
   components/
-    Sidebar.astro           책의 목차. 아티스트 8명을 상시 노출
-    IndexTable.astro        Home · Artist · Shop이 공유하는 단 하나의 목록 조판
-    MetaBlock.astro         명도만 낮춘 메타데이터 덩어리
-  lib/format.ts             상태 라벨, 가격·번호 포맷
-  pages/                    라우트
-  styles/type.css           조판 시스템
-tina/config.ts              CMS 스키마
+    SiteIndex.astro           인덱스 메뉴. Artist는 details/summary로 접힙니다
+    RecordTable.astro         Home과 Artist 색인이 공유하는 목록 조판
+    FactList.astro            아티스트 메타데이터를 dl로 늘어놓습니다
+  pages/                      라우트
+  styles/type.css             조판 시스템
+tina/config.ts                CMS 스키마
+tina/tina-lock.json           TinaCloud가 브랜치를 색인하는 데 쓰는 파일
 ```
 
-`IndexTable`을 세 페이지가 공유하는 것이 핵심입니다. 페이지를 옮겨도 같은 문서를 넘기는 감각이 유지되고, 그것이 아카이브처럼 읽히는 실질적인 이유입니다.
+### 본문과 메뉴의 정렬
+
+`Base.astro`의 격자는 1행에 사이트 이름, 2행에 메뉴와 본문을 둡니다. 본문의 첫 줄이 메뉴 첫 항목과 같은 행에서 시작하므로 둘의 윗선이 자동으로 맞습니다. 사이트 이름 아래 여백은 `--identity-gap`이 정합니다.
+
+### 클래스 이름
+
+역할과 위치가 드러나게 지었습니다. `.site-identity`는 사이트 이름 칸, `.site-index`는 메뉴 칸, `.site-content`는 본문 칸입니다. `.index-link`는 메뉴 한 줄, `.item-number`는 그 앞의 번호, `.index-name`은 이름입니다. 번호에는 밑줄이 붙지 않도록 이름 쪽에만 밑줄을 겁니다.
+
+### 모바일
+
+메뉴를 접지 않고 문서 맨 위로 흘려보냅니다. 아티스트 목록은 한 줄로 이어지고 번호는 숨겨서 메뉴가 차지하는 높이를 줄입니다. 햄버거 아이콘 대신 하단 한 줄의 `Index`로 되돌아갑니다.
+
+## Shop
+
+사이트 안에 상품 페이지를 두지 않습니다. 메뉴의 Shop은 `content/settings/settings.json`의 `shopUrl`로 연결되고, `https://`로 시작하는 주소를 넣으면 새 창으로 열립니다. 비워 두면 홈으로 이동합니다.
+
+## 이미지
+
+아티스트 상세에는 프로필 한 장과 무드 이미지 여러 장 자리가 있고, Home에는 우측 하단에 작은 이미지 자리가 있습니다. 비어 있으면 점선 틀과 라벨이 보이고, Tina에서 이미지를 넣으면 자동으로 사라집니다. Tina의 이미지 필드는 오른쪽 ✕로 지우고, 무드 이미지처럼 목록인 필드는 항목 메뉴에서 순서를 바꾸거나 삭제합니다.
 
 ## 로컬 개발
 
 ```bash
 npm install
-npm run dev        # Tina 편집기 + Astro, http://localhost:4321/admin/index.html
-npm run build:site # Astro만 빌드 (Tina 자격증명 없이도 통과)
-npm run build      # Tina 어드민까지 함께 빌드
+npm run dev        # Tina 편집기 + Astro
+npm run build:site # Astro만 빌드. Tina 자격증명 없이도 통과합니다
+npm run build      # 자격증명이 있으면 어드민까지 함께 빌드합니다
 ```
 
-## Tina CMS 연결 순서
+`.env`에 세 값이 필요합니다.
 
-순서를 지켜야 하는 이유는, Tina Cloud가 저장소를 먼저 보고 Client ID를 발급하고, 그 값이 있어야 빌드가 어드민을 만들 수 있기 때문입니다.
+```
+TINA_PUBLIC_CLIENT_ID=...
+TINA_TOKEN=...
+TINA_BRANCH=main
+```
 
-1. **이 PR을 `main`에 머지합니다.** Tina Cloud는 지정한 브랜치의 `tina/config.ts`를 읽으므로 코드가 `main`에 있어야 합니다.
-2. **[app.tina.io](https://app.tina.io)에 GitHub 계정으로 로그인**하고 새 프로젝트를 만듭니다. 기존 저장소를 가져오는 쪽을 고르고 `gyeon2357/archype`를 지정합니다.
-3. **Tina의 GitHub App 설치를 승인**합니다. 권한은 이 저장소 하나로만 한정하세요. 전체 저장소 접근을 줄 필요가 없습니다.
-4. 브랜치를 `main`으로 지정합니다.
-5. **Client ID를 복사**합니다. 공개되어도 되는 값입니다.
-6. **토큰을 발급**합니다 (Tokens 또는 API Keys 쪽). 이쪽은 비밀값이니 저장소에 커밋하지 마세요. `.env`는 이미 `.gitignore`에 들어 있습니다.
-7. 로컬에 `.env`를 만들고 세 값을 넣습니다.
+## 배포
 
-   ```
-   TINA_PUBLIC_CLIENT_ID=...
-   TINA_TOKEN=...
-   TINA_BRANCH=main
-   ```
+Cloudflare Workers Builds가 저장소를 보고 있습니다. `main`에 커밋이 올라가면 빌드와 배포가 자동으로 돌아갑니다. 직접 누를 필요가 없고, 다른 브랜치에 올리면 미리보기 URL이 따로 생깁니다.
 
-8. `npm run dev` → `http://localhost:4321/admin/index.html`에서 편집기가 뜨는지 확인합니다. 로컬에서는 파일에 직접 저장되므로 커밋은 직접 해야 합니다.
-9. **Cloudflare Pages 프로젝트를 만들고** 이 저장소를 연결합니다. 빌드 명령 `npm run build`, 출력 디렉터리 `dist`, 환경변수로 위 세 값을 등록합니다.
-10. 배포된 주소의 `/admin/index.html`로 들어가 GitHub 로그인 후 편집합니다. 저장하면 Tina Cloud가 `main`에 커밋하고, Cloudflare가 그 푸시를 받아 재빌드합니다. 즉시 반영이 아니라 빌드 시간만큼 걸립니다.
-11. 편집자를 한 명 더 초대합니다. Tina Cloud 프로젝트의 Collaborators에 추가하면 됩니다.
+빌드 시점 환경변수는 **Settings → Build → Build variables and secrets**에 넣습니다. 바로 아래 Variables & Secrets는 런타임용이라 빌드에서 보이지 않습니다.
 
-무료 플랜은 편집자 2명, 역할 3개, 월 대역폭 100GB, 에셋 개당 100MB입니다. 편집자를 더 늘려야 하면 Decap이나 Sveltia 같은 깃 기반 CMS로 교체하는 쪽이 비용이 맞습니다.
+| 이름 | 값 | 유형 |
+|---|---|---|
+| `TINA_PUBLIC_CLIENT_ID` | TinaCloud Overview에서 복사 | 텍스트 |
+| `TINA_TOKEN` | TinaCloud에서 발급한 토큰 | secret |
+| `TINA_BRANCH` | `main` | 텍스트 |
+| `NODE_VERSION` | `22` | 텍스트 |
 
-### 자격증명 없이 빌드하기
+`npm run build`는 `scripts/build.mjs`를 거칩니다. Tina 자격증명이 없으면 어드민 빌드를 건너뛰고 사이트만 만들기 때문에, 연결 전에도 배포가 깨지지 않습니다.
 
-`npm run build:site`는 Astro만 돌리므로 Tina 자격증명이 없어도 통과합니다. 레이아웃만 확인할 때 쓰세요.
+GitHub Pages는 쓸 수 없습니다. 온라인 비즈니스나 전자상거래 사이트의 무료 호스팅으로 쓰는 것이 금지되어 있습니다. Vercel Hobby도 비상업적 개인 용도로만 허용됩니다.
 
-## 배포 — Vercel
+## TinaCMS 버전
 
-프레임워크 프리셋은 Astro, 빌드 명령 `npm run build`, 출력 디렉터리 `dist`입니다. 어댑터는 필요 없습니다. 정적 출력이라 그대로 올라갑니다.
-
-`npm run build`는 `scripts/build.mjs`를 거칩니다. Tina 환경변수가 없으면 어드민 빌드를 건너뛰고 사이트만 만들기 때문에, Tina Cloud를 연결하기 전에도 배포가 깨지지 않습니다. 환경변수를 넣는 순간 같은 명령이 어드민까지 함께 빌드합니다.
-
-유의할 점 하나. Vercel Hobby 플랜은 비상업적 개인 용도로만 허용되고, 상업적 사용은 Pro 이상이 필요합니다. Shop이 있는 사이트라 Pro(멤버당 월 $20) 기준으로 잡으셔야 합니다.
-
-GitHub Pages는 온라인 비즈니스나 전자상거래 사이트의 무료 호스팅으로 쓰는 것이 금지되어 있어 이 사이트에는 쓸 수 없습니다.
+TinaCloud가 새 로그인 시스템으로 옮겨가면서 3.12 미만에서는 어드민 로그인이 막힙니다. `tinacms`와 `@tinacms/cli`는 항상 함께 올리고, 올린 뒤에는 `npm run dev`를 한 번 돌려 `tina/tina-lock.json`을 갱신한 다음 커밋하세요. TinaCloud가 그 파일로 사이트의 TinaCMS 버전과 스키마를 판단합니다.
 
 ## 파비콘
 
-`public/`에 세 개가 들어 있고 `Base.astro`에서 연결합니다.
-
-- `favicon.svg` — 기본. 다크 모드에서 마크 색이 반전되도록 `prefers-color-scheme`을 넣어 뒀습니다.
-- `favicon.ico` — 16·32·48 멀티사이즈. SVG 파비콘을 지원하지 않는 환경용입니다.
-- `apple-touch-icon.png` — 180×180. iOS가 투명 배경을 검정으로 채우므로 흰 배경을 깔았습니다.
-
-로고를 교체할 때는 원본을 정사각 캔버스에 여백 8%로 다시 앉히고 같은 세 종을 만드세요. 16px에서 읽히는지 확인하는 게 전부입니다.
-
-## 주문
-
-결제 연동 없이 폼으로 주문 정보와 배송지를 받고 계좌이체로 처리합니다. 상품별 `orderUrl`이 비어 있으면 `content/settings/settings.json`의 `orderFormUrl`로 연결됩니다.
-
-품절 상품은 목록에서 내리지 않고 `soldout` 또는 `archived` 상태로 남깁니다. 지난 상품도 아티스트의 활동 기록으로 기능합니다.
+`public/`에 세 개가 있고 `Base.astro`에서 연결합니다. `favicon.svg`가 기본이고 다크 모드에서 마크 색이 반전됩니다. `favicon.ico`는 16·32·48 멀티사이즈, `apple-touch-icon.png`는 180×180에 흰 배경입니다. 로고를 교체할 때는 정사각 캔버스에 여백 8%로 다시 앉히고 16px에서 읽히는지 확인하세요.

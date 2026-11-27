@@ -1,0 +1,32 @@
+---
+/**
+ * 아티스트의 메타데이터를 라벨과 값의 쌍으로 늘어놓는다.
+ * 정의 목록(dl)을 쓰는 이유는 라벨과 값의 관계가 태그에 드러나기 때문이다.
+ */
+export interface Fact {
+  label: string;
+  value?: string | null;
+  /** 값에 링크를 걸 때 */
+  url?: string;
+}
+
+interface Props {
+  facts: Fact[];
+}
+
+const { facts } = Astro.props;
+const filled = facts.filter((fact) => fact.value);
+---
+
+{
+  filled.length > 0 && (
+    <dl class="fact-list">
+      {filled.map((fact) => (
+        <div class="fact-row">
+          <dt class="section-label">{fact.label}</dt>
+          <dd>{fact.url ? <a href={fact.url}>{fact.value}</a> : fact.value}</dd>
+        </div>
+      ))}
+    </dl>
+  )
+}

@@ -1,0 +1,80 @@
+---
+/**
+ * 사이트의 단 하나의 목록 조판.
+ * Home의 활동 기록과 Artist 색인이 같은 표를 쓴다.
+ * 페이지를 옮겨도 같은 문서를 넘기는 감각이 유지되는 장치다.
+ */
+export interface Column {
+  /** rows의 cells에서 값을 꺼낼 키 */
+  key: string;
+  /** 표 머리에 쓸 라틴 라벨 */
+  label: string;
+  /** 번호 열처럼 좁게 고정할 때 */
+  isNumber?: boolean;
+  /** 줄바꿈을 막을 때 */
+  noWrap?: boolean;
+  /** 분류·장르처럼 성격을 표시하는 열 */
+  isClassifier?: boolean;
+}
+
+export interface Row {
+  /** 링크를 걸 주소. 없으면 글자만 놓인다 */
+  href?: string;
+  cells: Record<string, string | number | null | undefined>;
+}
+
+interface Props {
+  columns: Column[];
+  rows: Row[];
+  /** 링크를 걸 열의 key. 기본값은 두 번째 열 */
+  linkKey?: string;
+}
+
+const { columns, rows, linkKey } = Astro.props;
+const anchorKey = linkKey ?? columns[1]?.key ?? columns[0]?.key;
+
+function cellClass(column: Column) {
+  const names: string[] = [];
+  if (column.isNumber) names.push('col-number', 'item-number');
+  if (column.noWrap) names.push('col-nowrap');
+  if (column.isClassifier) names.push('classifier');
+  return names.join(' ') || undefined;
+}
+
+function headClass(column: Column) {
+  if (column.isNumber) return 'col-number';
+  if (column.noWrap) return 'col-nowrap';
+  return undefined;
+}
+
+function cellText(value: string | number | null | undefined) {
+  return value === null || value === undefined || value === '' ? '—' : String(value);
+}
+---
+
+<table class="record-table">
+  <thead>
+    <tr>
+      {columns.map((column) => <th class={headClass(column)} scope="col">{column.label}</th>)}
+    </tr>
+  </thead>
+  <tbody>
+    {
+      rows.map((row) => (
+        <tr>
+          {
+            columns.map((column) => (
+              <td class={cellClass(column)}>
+                {row.href && column.key === anchorKey ? (
+                  <a href={row.href}>{cellText(row.cells[column.key])}</a>
+                ) : (
+                  cellText(row.cells[column.key])
+                )}
+              </td>
+            ))
+          }
+        </tr>
+      ))
+    }
+  </tbody>
+</table>

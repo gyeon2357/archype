@@ -1,13 +1,14 @@
 /* ===========================================================
    ARCHYPE — 조판 시스템
-   원칙: 글자 크기는 두 단계만 쓴다. 위계는 크기가 아니라
-   대소문자 · 자간 · 명도 · 이탤릭 · 여백으로만 만든다.
+
+   원칙
+   1. 글자 크기는 두 단계만 쓴다. 세 번째를 추가하지 않는다.
+   2. 글자 색은 검정 하나뿐이다. 명도로 위계를 만들지 않는다.
+   3. 남은 구분 수단은 대소문자 · 자간 · 기울임 · 여백 · 괘선이다.
    =========================================================== */
 
-/* Pretendard Regular 한 종만 쓴다. 굵기가 하나뿐이라
-   위계를 굵기로 만들 수 없고, 그것이 이 사이트의 전제와 맞는다.
-   서브셋에 한글 2,780자가 들어 있어 일상적인 범위는 덮지만
-   희귀 음절은 아래 폴백으로 넘어간다. */
+/* 라틴은 브라우저가 가진 Helvetica로, 한글은 Pretendard로 떨어진다.
+   Helvetica에 한글 글리프가 없어서 폴백이 자연스럽게 갈린다. */
 @font-face {
   font-family: 'Pretendard';
   src:
@@ -19,36 +20,27 @@
 }
 
 :root {
-  /* 크기는 둘뿐이다. 세 번째를 추가하지 않는다. */
-  --fs: 12px;      /* 본문 겸 캡션. 한글 가독 하한을 고려한 값 */
-  --fs-sm: 10.5px; /* 라틴 전용 라벨·번호·메타. 한글에 쓰지 않는다 */
+  /* 크기 — 둘뿐이다 */
+  --text-size: 12px; /* 본문 겸 캡션. 한글 가독 하한 */
+  --label-size: 10.5px; /* 라틴 전용 라벨·번호. 한글에 쓰지 않는다 */
 
-  --lh: 1.65;
-  --lh-tight: 1.45;
+  --line-height: 1.6;
+  --line-height-tight: 1.4;
 
-  /* 위계를 담당하는 명도 단계 */
-  --ink: #111111;
-  --ink-60: rgba(17, 17, 17, 0.6);
-  --ink-38: rgba(17, 17, 17, 0.38);
-  --rule: rgba(17, 17, 17, 0.16);
+  /* 색 — 글자는 검정 하나 */
+  --ink: #000000;
   --paper: #ffffff;
+  --rule: rgba(0, 0, 0, 0.18);
+  --rule-faint: rgba(0, 0, 0, 0.1);
 
-  --sidebar-w: 200px;
-  --pad: 18px;
-  --row-y: 7px;
+  /* 치수 */
+  --index-width: 200px;
+  --gutter: 18px;
+  --row-padding: 6px;
+  --identity-gap: 22px; /* 워드마크와 인덱스 사이. 본문 정렬 기준이 된다 */
+  --tap-size: 30px; /* 모바일 탭 타겟 최소 높이 */
 
-  --tracking-label: 0.09em;
-  --tap: 30px; /* 모바일 탭 타겟 최소 높이 */
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --ink: #ededed;
-    --ink-60: rgba(237, 237, 237, 0.6);
-    --ink-38: rgba(237, 237, 237, 0.38);
-    --rule: rgba(237, 237, 237, 0.18);
-    --paper: #0d0d0d;
-  }
+  --label-tracking: 0.09em;
 }
 
 *,
@@ -66,37 +58,31 @@ body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
-  font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic',
-    'Helvetica Neue', Arial, sans-serif;
-  font-size: var(--fs);
-  line-height: var(--lh);
+  font-family: Helvetica, 'Helvetica Neue', 'Pretendard', Arial, sans-serif;
+  font-size: var(--text-size);
+  line-height: var(--line-height);
   font-weight: 400;
-  /* 한글이 단어 중간에서 잘리지 않게 한다 */
-  word-break: keep-all;
+  word-break: keep-all; /* 한글이 단어 중간에서 잘리지 않게 */
   overflow-wrap: break-word;
   font-kerning: normal;
-  /* Regular 한 종만 올렸으므로 가짜 볼드는 막고, 기울임은 허용한다.
-     .ital을 분류 표시 채널로 쓰고 있어서 style 합성만 남긴다.
-     기계적으로 기울인 한글이 거슬리면 이 값을 none으로 바꾸고
-     .ital 대신 자간과 명도로 그 채널을 대체하면 된다. */
+  /* Regular 한 종만 올렸다. 가짜 볼드는 막고 기울임 합성만 남긴다 */
   font-synthesis: style;
 }
 
-/* 굵기로 강조하지 않는다. 마크다운의 ** ** 도 본문과 같은 굵기로 둔다. */
-strong,
-b {
-  font-weight: 400;
-}
-
-/* 제목 태그도 본문과 같은 크기로 둔다. 의미만 남기고 대비는 없앤다. */
+/* 제목 태그도 본문과 같은 크기로 둔다. 의미만 남기고 대비는 없앤다 */
 h1,
 h2,
-h3,
-h4 {
+h3 {
   margin: 0;
   font-size: inherit;
   font-weight: 400;
-  line-height: var(--lh-tight);
+  line-height: var(--line-height-tight);
+}
+
+/* 굵기로 강조하지 않는다 */
+strong,
+b {
+  font-weight: 400;
 }
 
 p {
@@ -113,22 +99,18 @@ a {
   text-decoration: none;
 }
 
-a:hover {
+a:hover,
+a:focus-visible {
   text-decoration: underline;
   text-underline-offset: 0.22em;
   text-decoration-thickness: 0.5px;
 }
 
-ul {
+ul,
+ol {
   margin: 0;
   padding: 0;
   list-style: none;
-}
-
-hr {
-  border: 0;
-  border-top: 1px solid var(--rule);
-  margin: var(--pad) 0;
 }
 
 img {
@@ -138,183 +120,164 @@ img {
 }
 
 /* -----------------------------------------------------------
-   위계를 담당하는 유틸리티. 크기를 바꾸는 건 .label 하나뿐이고,
-   그것도 라틴 대문자에만 쓴다.
+   라벨과 번호 — 크기를 바꾸는 건 이 둘뿐이고 라틴 대문자에만 쓴다
    ----------------------------------------------------------- */
 
-.label {
-  font-size: var(--fs-sm);
+.section-label {
+  font-size: var(--label-size);
   text-transform: uppercase;
-  letter-spacing: var(--tracking-label);
-  color: var(--ink-60);
+  letter-spacing: var(--label-tracking);
 }
 
-.meta {
-  color: var(--ink-60);
+.item-number {
+  font-size: var(--label-size);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  /* 번호에는 밑줄이 생기지 않는다 */
+  text-decoration: none !important;
 }
 
-.dim {
-  color: var(--ink-38);
-}
-
-.ital {
+/* 분류·장르처럼 성격을 표시하는 자리 */
+.classifier {
   font-style: italic;
 }
 
-.num {
-  font-size: var(--fs-sm);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.04em;
-  color: var(--ink-38);
-}
-
-/* 버튼은 버튼처럼 보이지 않게 한다. 대괄호가 기능을 알린다. */
-.btn {
+/* 버튼처럼 보이지 않는 버튼. 대괄호가 기능을 알린다 */
+.action-link {
   display: inline-block;
-  min-height: var(--tap);
-  line-height: var(--tap);
-  letter-spacing: 0.06em;
+  font-size: var(--label-size);
   text-transform: uppercase;
-  font-size: var(--fs-sm);
+  letter-spacing: 0.06em;
+  line-height: var(--tap-size);
+  min-height: var(--tap-size);
 }
 
-.btn::before {
+.action-link::before {
   content: '[';
 }
 
-.btn::after {
+.action-link::after {
   content: ']';
 }
 
-.btn:hover {
-  text-decoration: none;
-  color: var(--ink-60);
-}
-
-.sold {
-  color: var(--ink-38);
-  text-decoration: line-through;
-  text-decoration-thickness: 0.5px;
-}
-
 /* -----------------------------------------------------------
-   인덱스 표 — Home · Artist · Shop이 공유하는 단 하나의 조판
+   기록 표 — Home과 Artist 색인이 공유하는 단 하나의 목록 조판
    ----------------------------------------------------------- */
 
-table.index {
+.record-table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: auto;
 }
 
-table.index th {
-  font-size: var(--fs-sm);
+.record-table th {
+  font-size: var(--label-size);
   font-weight: 400;
   text-transform: uppercase;
-  letter-spacing: var(--tracking-label);
-  color: var(--ink-38);
+  letter-spacing: var(--label-tracking);
   text-align: left;
-  padding: 0 1.2em var(--row-y) 0;
+  padding: 0 1.2em var(--row-padding) 0;
   border-bottom: 1px solid var(--rule);
   white-space: nowrap;
 }
 
-table.index td {
-  padding: var(--row-y) 1.2em var(--row-y) 0;
-  border-bottom: 1px solid var(--rule);
+.record-table td {
+  padding: var(--row-padding) 1.2em var(--row-padding) 0;
+  border-bottom: 1px solid var(--rule-faint);
   vertical-align: baseline;
 }
 
-table.index td:last-child,
-table.index th:last-child {
+.record-table th:last-child,
+.record-table td:last-child {
   padding-right: 0;
 }
 
-table.index tbody tr:hover td {
-  color: var(--ink-60);
+.col-number {
+  width: 3.4em;
 }
 
-table.index tbody tr:hover td a {
-  text-decoration: underline;
-  text-underline-offset: 0.22em;
-  text-decoration-thickness: 0.5px;
-}
-
-table.index .c-no {
-  width: 3em;
-}
-
-table.index .c-nowrap {
+.col-nowrap {
   white-space: nowrap;
-}
-
-/* 스펙 표 — 상품 상세의 사양. 인덱스 표와 같은 규칙을 쓴다. */
-table.spec {
-  border-collapse: collapse;
-  width: 100%;
-  max-width: 30em;
-}
-
-table.spec th {
-  font-size: var(--fs-sm);
-  font-weight: 400;
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-label);
-  color: var(--ink-38);
-  text-align: left;
-  white-space: nowrap;
-  width: 8em;
-  padding: var(--row-y) 1.2em var(--row-y) 0;
-  border-bottom: 1px solid var(--rule);
-  vertical-align: baseline;
-}
-
-table.spec td {
-  padding: var(--row-y) 0;
-  border-bottom: 1px solid var(--rule);
-  vertical-align: baseline;
 }
 
 /* -----------------------------------------------------------
-   섹션 · 블록
+   사실 목록 — 아티스트 상세의 메타데이터
    ----------------------------------------------------------- */
 
-.block {
-  margin-bottom: calc(var(--pad) * 2.2);
+.fact-list {
+  margin: 0 0 calc(var(--gutter) * 1.4);
+  display: grid;
+  gap: 2px;
 }
 
-.block:last-child {
+.fact-row {
+  display: grid;
+  grid-template-columns: 7em 1fr;
+  gap: 1em;
+  align-items: baseline;
+}
+
+.fact-row dt,
+.fact-row dd {
+  margin: 0;
+}
+
+/* -----------------------------------------------------------
+   블록과 이미지
+   ----------------------------------------------------------- */
+
+.content-block {
+  margin-bottom: calc(var(--gutter) * 2);
+}
+
+.content-block:last-child {
   margin-bottom: 0;
 }
 
-.block > .label {
+.content-block > .section-label {
   display: block;
-  margin-bottom: var(--row-y);
+  margin-bottom: var(--row-padding);
 }
 
-.notice {
-  padding-bottom: var(--pad);
-  margin-bottom: calc(var(--pad) * 2);
+.site-notice {
+  padding-bottom: var(--gutter);
+  margin-bottom: calc(var(--gutter) * 2);
   border-bottom: 1px solid var(--rule);
 }
 
-.prose {
+.body-text {
   max-width: 44em;
 }
 
-.gallery {
+.image-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: var(--pad);
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: var(--gutter);
 }
 
-.gallery figcaption {
+figure {
+  margin: 0;
+}
+
+figcaption {
   margin-top: 5px;
-  color: var(--ink-60);
+}
+
+/* 이미지가 아직 없을 때 자리를 보여주는 틀.
+   Tina에서 이미지를 넣으면 자동으로 사라진다 */
+.image-placeholder {
+  display: flex;
+  align-items: flex-end;
+  padding: var(--row-padding);
+  border: 1px dashed var(--rule);
+  aspect-ratio: 4 / 5;
+}
+
+.image-placeholder--wide {
+  aspect-ratio: 3 / 2;
 }
 
 @media (max-width: 720px) {
   :root {
-    --pad: 14px;
+    --gutter: 14px;
   }
 }

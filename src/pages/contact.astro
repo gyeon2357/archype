@@ -5,26 +5,27 @@ import settings from '../../content/settings/settings.json';
 
 const contact = await getEntry('pages', 'contact');
 const { Content } = contact ? await render(contact) : { Content: null };
+const socials = settings.socials ?? [];
 ---
 
 <Base title="Contact">
-  <section class="block">
-    <span class="label">Contact</span>
-    <div class="prose">
+  <section class="content-block">
+    <h1 class="section-label">Contact</h1>
+    <div class="body-text">
       {Content && <Content />}
     </div>
   </section>
 
   {
-    (settings.contactEmail || settings.socials?.length > 0) && (
-      <section class="block">
-        <ul class="links meta">
+    (settings.contactEmail || socials.length > 0) && (
+      <section class="content-block">
+        <ul class="contact-links">
           {settings.contactEmail && (
             <li>
               <a href={`mailto:${settings.contactEmail}`}>{settings.contactEmail}</a>
             </li>
           )}
-          {settings.socials?.map((social) => (
+          {socials.map((social) => (
             <li>
               <a href={social.url} target="_blank" rel="noopener noreferrer">
                 {social.label}
@@ -38,9 +39,9 @@ const { Content } = contact ? await render(contact) : { Content: null };
 </Base>
 
 <style>
-  .links {
+  .contact-links {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 1px;
   }
 </style>

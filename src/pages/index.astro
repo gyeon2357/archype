@@ -1,8 +1,8 @@
 ---
 import { getCollection, getEntry, render } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import IndexTable from '../components/IndexTable.astro';
-import type { Column, Row } from '../components/IndexTable.astro';
+import RecordTable from '../components/RecordTable.astro';
+import type { Column, Row } from '../components/RecordTable.astro';
 
 const home = await getEntry('pages', 'home');
 const { Content } = home ? await render(home) : { Content: null };
@@ -10,69 +10,34 @@ const { Content } = home ? await render(home) : { Content: null };
 const artists = (await getCollection('artists')).sort(
   (a, b) => a.data.no - b.data.no
 );
-const products = await getCollection('products');
 
-/* 릴리스 · 작업 · 입고를 한 흐름에 섞어 역순으로 쌓는다.
-   e-g-h의 프로젝트 목록과 같은 구조이고, 이 사이트가
-   아카이브처럼 보이는 가장 결정적인 화면이다. */
-type Entry = {
-  year: string;
-  artist: string;
-  title: string;
-  kind: string;
-  href: string;
-  muted?: boolean;
-};
-
-const entries: Entry[] = [];
-
-for (const artist of artists) {
-  for (const work of artist.data.works) {
-    entries.push({
-      year: work.year ?? '',
-      artist: artist.data.name,
-      title: work.title,
-      kind: work.type ?? '',
+/* 아티스트들의 작업을 한 흐름에 모아 연도 역순으로 쌓는다.
+   아직 작업이 없으면 아티스트 색인으로 대체한다. */
+const activityRows: Row[] = artists
+  .flatMap((artist) =>
+    artist.data.works.map((work) => ({
       href: `/artist/${artist.id}`,
-    });
-  }
-}
+      cells: {
+        year: work.year ?? '',
+        title: work.title,
+        artist: artist.data.name,
+        type: work.type ?? '',
+      },
+    }))
+  )
+  .sort((a, b) => String(b.cells.year).localeCompare(String(a.cells.year)));
 
-for (const product of products) {
-  entries.push({
-    year: product.data.year ?? '',
-    artist: product.data.artist ?? '',
-    title: product.data.title,
-    kind: 'Shop',
-    href: `/shop/${product.id}`,
-    muted: product.data.status === 'soldout' || product.data.status === 'archived',
-  });
-}
-
-entries.sort((a, b) => (b.year ?? '').localeCompare(a.year ?? ''));
-
-const recentColumns: Column[] = [
-  { key: 'year', label: 'Year', no: true },
+const activityColumns: Column[] = [
+  { key: 'year', label: 'Year', isNumber: true },
   { key: 'title', label: 'Item' },
-  { key: 'artist', label: 'Artist', nowrap: true },
-  { key: 'kind', label: 'Type', ital: true, dim: true, nowrap: true },
+  { key: 'artist', label: 'Artist', noWrap: true },
+  { key: 'type', label: 'Type', isClassifier: true, noWrap: true },
 ];
 
-const recentRows: Row[] = entries.map((entry) => ({
-  href: entry.href,
-  muted: entry.muted,
-  cells: {
-    year: entry.year,
-    title: entry.title,
-    artist: entry.artist,
-    kind: entry.kind,
-  },
-}));
-
 const artistColumns: Column[] = [
-  { key: 'no', label: 'No', no: true },
+  { key: 'no', label: 'No', isNumber: true },
   { key: 'name', label: 'Artist' },
-  { key: 'roles', label: 'Role', dim: true },
+  { key: 'roles', label: 'Role' },
 ];
 
 const artistRows: Row[] = artists.map((artist) => ({
@@ -83,34 +48,62 @@ const artistRows: Row[] = artists.map((artist) => ({
     roles: artist.data.roles.join(', '),
   },
 }));
+
+const hasActivity = activityRows.length > 0;
 ---
 
 <Base>
-  {
-    home?.data.notice && (
-      <div class="notice meta">{home.data.notice}</div>
-    )
-  }
+  {home?.data.notice && <p class="site-notice">{home.data.notice}</p>}
 
   {
     Content && (
-      <div class="block prose">
+      <section class="content-block body-text">
         <Content />
-      </div>
+      </section>
     )
   }
 
-  {
-    recentRows.length > 0 ? (
-      <section class="block">
-        <span class="label">Recent</span>
-        <IndexTable columns={recentColumns} rows={recentRows} linkKey="title" />
-      </section>
-    ) : (
-      <section class="block">
-        <span class="label">Index</span>
-        <IndexTable columns={artistColumns} rows={artistRows} linkKey="name" />
-      </section>
-    )
-  }
+  <section class="content-block">
+    <h2 class="section-label">{hasActivity ? 'Recent' : 'Index'}</h2>
+    <RecordTable
+      columns={hasActivity ? activityColumns : artistColumns}
+      rows={hasActivity ? activityRows : artistRows}
+      linkKey={hasActivity ? 'title' : 'name'}
+    />
+  </section>
+
+  <!-- 우측 하단에 작게 놓이는 이미지 자리 -->
+  <section class="content-block home-image-slot">
+    {
+      home?.data.image ? (
+        <figure class="home-image">
+          <img src={home.data.image} alt={home.data.imageCaption ?? ''} loading="lazy" />
+          {home.data.imageCaption && <figcaption>{home.data.imageCaption}</figcaption>}
+        </figure>
+      ) : (
+        <div class="home-image image-placeholder image-placeholder--wide">
+          <span class="section-label">Image</span>
+        </div>
+      )
+    }
+  </section>
 </Base>
+
+<style>
+  .home-image-slot {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: calc(var(--gutter) * 3);
+  }
+
+  .home-image {
+    width: 200px;
+    max-width: 60%;
+  }
+
+  @media (max-width: 720px) {
+    .home-image {
+      width: 150px;
+    }
+  }
+</style>

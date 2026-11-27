@@ -8,7 +8,6 @@ const branch =
 
 export default defineConfig({
   branch,
-  // Tina Cloud 프로젝트를 만든 뒤 환경변수로 넣습니다.
   clientId: process.env.TINA_PUBLIC_CLIENT_ID ?? null,
   token: process.env.TINA_TOKEN ?? null,
 
@@ -47,7 +46,7 @@ export default defineConfig({
             label: '인덱스 번호',
             type: 'number',
             required: true,
-            description: '사이드바와 표의 정렬 순서입니다.',
+            description: '메뉴와 표의 정렬 순서입니다.',
           },
           { name: 'roles', label: '역할', type: 'string', list: true },
           { name: 'genres', label: '장르', type: 'string', list: true },
@@ -78,10 +77,27 @@ export default defineConfig({
             ],
           },
           {
-            name: 'images',
-            label: '이미지',
+            name: 'profileImage',
+            label: '프로필 이미지',
+            type: 'image',
+            description:
+              '인물 사진 한 장. 비워 두면 사이트에 자리표시자가 보입니다. 지우려면 이미지 옆의 ✕를 누르세요.',
+          },
+          {
+            name: 'profileCaption',
+            label: '프로필 캡션',
+            type: 'string',
+          },
+          {
+            name: 'moodImages',
+            label: '무드 이미지',
             type: 'object',
             list: true,
+            description:
+              '여러 장을 넣을 수 있습니다. 항목 오른쪽 메뉴에서 순서를 바꾸거나 삭제하세요.',
+            ui: {
+              itemProps: (item) => ({ label: item?.caption || '이미지' }),
+            },
             fields: [
               { name: 'src', label: '파일', type: 'image' },
               { name: 'caption', label: '캡션', type: 'string' },
@@ -97,73 +113,6 @@ export default defineConfig({
       },
 
       {
-        name: 'product',
-        label: 'Shop',
-        path: 'content/products',
-        format: 'md',
-        ui: {
-          router: ({ document }) => `/shop/${document._sys.filename}`,
-        },
-        fields: [
-          {
-            name: 'title',
-            label: '상품명',
-            type: 'string',
-            isTitle: true,
-            required: true,
-          },
-          { name: 'no', label: '번호', type: 'number', required: true },
-          {
-            name: 'artist',
-            label: '아티스트',
-            type: 'string',
-            description: 'Artist의 이름과 똑같이 입력하세요.',
-          },
-          { name: 'price', label: '가격 (원)', type: 'number' },
-          {
-            name: 'status',
-            label: '상태',
-            type: 'string',
-            options: [
-              { value: 'available', label: 'Available — 판매중' },
-              { value: 'preorder', label: 'Pre-order — 예약' },
-              { value: 'soldout', label: 'Sold out — 품절' },
-              { value: 'archived', label: 'Archived — 아카이브' },
-            ],
-          },
-          { name: 'year', label: '연도', type: 'string' },
-          {
-            name: 'orderUrl',
-            label: '주문 폼 링크',
-            type: 'string',
-            description: '비워 두면 Settings의 공용 주문 폼으로 연결됩니다.',
-          },
-          {
-            name: 'specs',
-            label: '사양',
-            type: 'object',
-            list: true,
-            ui: { itemProps: (item) => ({ label: item?.label }) },
-            fields: [
-              { name: 'label', label: '항목', type: 'string' },
-              { name: 'value', label: '내용', type: 'string' },
-            ],
-          },
-          {
-            name: 'images',
-            label: '이미지',
-            type: 'object',
-            list: true,
-            fields: [
-              { name: 'src', label: '파일', type: 'image' },
-              { name: 'caption', label: '캡션', type: 'string' },
-            ],
-          },
-          { name: 'body', label: '설명', type: 'rich-text', isBody: true },
-        ],
-      },
-
-      {
         name: 'page',
         label: 'Page',
         path: 'content/pages',
@@ -172,12 +121,30 @@ export default defineConfig({
           allowedActions: { create: false, delete: false },
         },
         fields: [
-          { name: 'title', label: '제목', type: 'string', isTitle: true, required: true },
+          {
+            name: 'title',
+            label: '제목',
+            type: 'string',
+            isTitle: true,
+            required: true,
+          },
           {
             name: 'notice',
             label: '공지 한 줄',
             type: 'string',
             description: 'Home 상단에 노출됩니다.',
+          },
+          {
+            name: 'image',
+            label: '이미지',
+            type: 'image',
+            description:
+              'Home 우측 하단에 작게 놓입니다. 비워 두면 자리표시자가 보이고, 지우려면 이미지 옆의 ✕를 누르세요.',
+          },
+          {
+            name: 'imageCaption',
+            label: '이미지 캡션',
+            type: 'string',
           },
           { name: 'body', label: '본문', type: 'rich-text', isBody: true },
         ],
@@ -192,20 +159,28 @@ export default defineConfig({
           allowedActions: { create: false, delete: false },
         },
         fields: [
-          { name: 'siteName', label: '사이트 이름', type: 'string', isTitle: true, required: true },
+          {
+            name: 'siteName',
+            label: '사이트 이름',
+            type: 'string',
+            isTitle: true,
+            required: true,
+          },
           { name: 'description', label: '사이트 설명', type: 'string' },
+          {
+            name: 'shopUrl',
+            label: 'Shop 링크',
+            type: 'string',
+            description:
+              '메뉴의 Shop이 연결될 주소입니다. 외부 주소(https://로 시작)를 넣으면 새 창으로 열립니다. 비워 두면 홈으로 이동합니다.',
+          },
           { name: 'contactEmail', label: '대표 이메일', type: 'string' },
           {
-            name: 'orderFormUrl',
-            label: '공용 주문 폼 링크',
-            type: 'string',
-            description: '상품별 링크가 없을 때 사용됩니다.',
-          },
-          {
             name: 'socials',
-            label: 'SNS',
+            label: '링크',
             type: 'object',
             list: true,
+            description: '메뉴 하단에 순서대로 노출됩니다.',
             ui: { itemProps: (item) => ({ label: item?.label }) },
             fields: [
               { name: 'label', label: '이름', type: 'string' },
