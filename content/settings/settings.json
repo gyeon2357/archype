@@ -10,12 +10,12 @@
       "url": "https://instagram.com/"
     },
     {
-      "label": "Linktree",
-      "url": "https://linktr.ee/archypeteam"
-    },
-    {
       "label": "Youtube",
       "url": "https://www.youtube.com/@archypeteam"
+    },
+    {
+      "label": "Linktree",
+      "url": "https://linktr.ee/archypeteam"
     }
   ]
 }
