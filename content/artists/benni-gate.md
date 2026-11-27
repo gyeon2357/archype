@@ -5,7 +5,9 @@ roles: []
 genres: []
 since: '2026'
 base: ''
-links: []
+links:
+  - label: benni-gate
+    url: 'https://www.instagram.com/arc.hype/'
 profileCaption: ''
 ---
 
