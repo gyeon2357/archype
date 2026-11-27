@@ -7,6 +7,8 @@ import { refToSlug, pad } from '../lib/artists';
 
 const home = await getEntry('home', 'index');
 const { Content } = home ? await render(home) : { Content: null };
+/* 본문이 비어 있으면 빈 블록의 여백이 남으므로 아예 그리지 않는다 */
+const hasBody = Boolean(home?.body?.trim());
 
 const artists = (await getCollection('artists')).sort(
   (a, b) => a.data.no - b.data.no
@@ -62,8 +64,12 @@ const hasActivity = activityRows.length > 0;
 ---
 
 <Base>
+  <header class="page-head">
+    <h1 class="section-label">{hasActivity ? 'Recent' : 'Index'}</h1>
+  </header>
+
   {
-    Content && (
+    hasBody && Content && (
       <section class="content-block body-text">
         <Content />
       </section>
@@ -71,7 +77,6 @@ const hasActivity = activityRows.length > 0;
   }
 
   <section class="content-block">
-    <h2 class="section-label">{hasActivity ? 'Recent' : 'Index'}</h2>
     <RecordTable
       columns={hasActivity ? activityColumns : artistColumns}
       rows={hasActivity ? activityRows : artistRows}

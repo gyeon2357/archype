@@ -4,7 +4,7 @@ import Base from '../../layouts/Base.astro';
 import FactList from '../../components/FactList.astro';
 import RecordTable from '../../components/RecordTable.astro';
 import type { Column, Row } from '../../components/RecordTable.astro';
-import { refToSlug, pad } from '../../lib/artists';
+import { refToSlug } from '../../lib/artists';
 
 export async function getStaticPaths() {
   const artists = await getCollection('artists');
@@ -16,6 +16,7 @@ export async function getStaticPaths() {
 
 const { artist } = Astro.props;
 const { Content } = await render(artist);
+const hasBody = Boolean(artist.body?.trim());
 const data = artist.data;
 
 /* 이 아티스트가 참여한 작업만 추린다. 협업 작업은 함께한 사람도
@@ -52,7 +53,7 @@ const workRows: Row[] = works.map((work) => ({
 
 <Base title={data.name}>
   <!-- 이름도 본문과 같은 크기로 둔다. 위계는 위치와 여백이 만든다 -->
-  <header class="content-block">
+  <header class="page-head">
     <h1>{data.name}</h1>
   </header>
 
@@ -60,11 +61,14 @@ const workRows: Row[] = works.map((work) => ({
     <div class="artist-facts">
       <FactList
         facts={[
-          { label: 'No', value: pad(data.no) },
           { label: 'Role', value: data.roles.join(', ') },
           { label: 'Genre', value: data.genres.join(', ') },
           { label: 'Since', value: data.since },
           { label: 'Base', value: data.base },
+          ...data.extra.map((item) => ({
+            label: item.label ?? '',
+            value: item.value,
+          })),
           ...data.links.map((link) => ({
             label: link.label,
             value: link.url.replace(/^https?:\/\//, ''),
@@ -93,9 +97,13 @@ const workRows: Row[] = works.map((work) => ({
     </figure>
   </div>
 
-  <section class="content-block body-text">
-    <Content />
-  </section>
+  {
+    hasBody && (
+      <section class="content-block body-text">
+        <Content />
+      </section>
+    )
+  }
 
   {
     workRows.length > 0 && (

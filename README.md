@@ -43,6 +43,18 @@ tina/tina-lock.json           TinaCloud가 브랜치를 색인하는 데 쓰는 
 
 `Base.astro`의 격자는 2열 3행입니다. 1행에 사이트 이름, 2행에 메뉴와 본문, 3행에 푸터를 둡니다. 본문의 첫 줄이 메뉴 첫 항목과 같은 행에서 시작하므로 둘의 윗선이 자동으로 맞고, 푸터는 `align-self: end`로 좌측 최하단에 붙습니다. 사이트 이름 아래 여백은 `--identity-gap`이 정합니다.
 
+### 페이지 상단 구조
+
+모든 페이지가 같은 머리 블록으로 시작합니다.
+
+```html
+<header class="page-head">
+  <h1>…</h1>
+</header>
+```
+
+`.page-head`의 줄 높이를 20px로 못 박아 두어서, 안에 들어가는 글자가 작은 라벨(Contact, Recent, Artist Index)이든 본문 크기의 아티스트 이름이든 첫 줄이 같은 자리에 섭니다. 아래 여백도 `.content-block`과 같은 값입니다. 본문이 비어 있으면 빈 블록의 여백이 남으므로 그 섹션은 아예 그리지 않습니다.
+
 ### 클래스 이름
 
 역할과 위치가 드러나게 지었습니다. `.site-identity`는 사이트 이름 칸, `.site-index`는 메뉴 칸, `.site-content`는 본문 칸, `.site-footer`는 링크와 저작권 줄입니다. `.index-link`는 메뉴 한 줄, `.item-number`는 그 앞의 번호, `.index-name`은 이름입니다. 번호에는 밑줄이 붙지 않도록 이름 쪽에만 밑줄을 겁니다.

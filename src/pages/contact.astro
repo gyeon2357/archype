@@ -5,16 +5,22 @@ import settings from '../../content/settings/settings.json';
 
 const contact = await getEntry('contact', 'index');
 const { Content } = contact ? await render(contact) : { Content: null };
+const hasBody = Boolean(contact?.body?.trim());
 const socials = settings.socials ?? [];
 ---
 
 <Base title="Contact">
-  <section class="content-block">
+  <header class="page-head">
     <h1 class="section-label">Contact</h1>
-    <div class="body-text">
-      {Content && <Content />}
-    </div>
-  </section>
+  </header>
+
+  {
+    hasBody && Content && (
+      <section class="content-block body-text">
+        <Content />
+      </section>
+    )
+  }
 
   {
     (settings.contactEmail || socials.length > 0) && (

@@ -15,6 +15,10 @@ const artists = defineCollection({
     genres: z.array(z.string()).default([]),
     since: z.string().optional(),
     base: z.string().optional(),
+    /** 장르·직무 외에 덧붙일 정보를 자유롭게 넣는 자리 */
+    extra: z
+      .array(z.object({ label: z.string().optional(), value: z.string().optional() }))
+      .default([]),
     links: z.array(link).default([]),
     /** 인물 사진 한 장 */
     profileImage: z.string().optional(),

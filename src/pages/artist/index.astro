@@ -33,8 +33,11 @@ const rows: Row[] = artists.map((artist) => ({
 ---
 
 <Base title="Artist">
-  <section class="content-block">
+  <header class="page-head">
     <h1 class="section-label">Artist Index</h1>
+  </header>
+
+  <section class="content-block">
     <RecordTable columns={columns} rows={rows} linkKey="name" />
   </section>
 </Base>

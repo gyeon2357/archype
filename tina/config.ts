@@ -50,6 +50,19 @@ export default defineConfig({
           { name: 'since', label: '활동 시작', type: 'string' },
           { name: 'base', label: '거점', type: 'string' },
           {
+            name: 'extra',
+            label: '기타 정보',
+            type: 'object',
+            list: true,
+            description:
+              '항목 이름과 내용을 적으면 상세 페이지의 정보 목록에 그대로 나옵니다.',
+            ui: { itemProps: (item) => ({ label: item?.label }) },
+            fields: [
+              { name: 'label', label: '항목', type: 'string' },
+              { name: 'value', label: '내용', type: 'string' },
+            ],
+          },
+          {
             name: 'links',
             label: '외부 링크',
             type: 'object',
