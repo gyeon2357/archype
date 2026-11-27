@@ -17,6 +17,10 @@ const activityRows: Row[] = artists
   .flatMap((artist) =>
     artist.data.works.map((work) => ({
       href: `/artist/${artist.id}`,
+      hrefs: {
+        /* 아티스트 이름을 눌러도 그 아티스트의 상세로 간다 */
+        artist: `/artist/${artist.id}`,
+      },
       cells: {
         year: work.year ?? '',
         title: work.title,
@@ -28,10 +32,10 @@ const activityRows: Row[] = artists
   .sort((a, b) => String(b.cells.year).localeCompare(String(a.cells.year)));
 
 const activityColumns: Column[] = [
-  { key: 'year', label: 'Year', isNumber: true },
-  { key: 'title', label: 'Item' },
+  { key: 'year', label: 'Year', isNumber: true, sortable: true },
+  { key: 'title', label: 'Item', sortable: true },
   { key: 'artist', label: 'Artist', noWrap: true },
-  { key: 'type', label: 'Type', isClassifier: true, noWrap: true },
+  { key: 'type', label: 'Type', isClassifier: true, noWrap: true, sortable: true },
 ];
 
 const artistColumns: Column[] = [
@@ -52,9 +56,7 @@ const artistRows: Row[] = artists.map((artist) => ({
 const hasActivity = activityRows.length > 0;
 ---
 
-<Base>
-  {home?.data.notice && <p class="site-notice">{home.data.notice}</p>}
-
+<Base notice={home?.data.notice}>
   {
     Content && (
       <section class="content-block body-text">

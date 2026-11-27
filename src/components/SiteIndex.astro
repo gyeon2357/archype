@@ -19,6 +19,7 @@ const path = Astro.url.pathname.replace(/\/+$/, '') || '/';
 const isContact = path === '/contact';
 
 const shopUrl = settings.shopUrl || '/';
+const shopLabel = settings.shopLabel || 'Shop';
 const shopIsExternal = /^https?:\/\//.test(shopUrl);
 
 const pad = (n: number) => String(n).padStart(2, '0');
@@ -58,7 +59,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
         target={shopIsExternal ? '_blank' : undefined}
         rel={shopIsExternal ? 'noopener noreferrer' : undefined}
       >
-        <span class="index-name">Shop</span>
+        <span class="index-name">{shopLabel}</span>
       </a>
     </li>
 

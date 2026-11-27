@@ -2,7 +2,8 @@
 /**
  * 사이트 뼈대.
  *
- * 데스크톱은 2열 3행 격자다.
+ * 공지 띠는 격자 밖에서 화면 전체 너비를 쓴다.
+ * 그 아래 데스크톱은 2열 3행 격자다.
  *   1행: 사이트 이름(ARCHYPE)  |  (비움)
  *   2행: 인덱스 메뉴           |  페이지 내용
  *   3행: 푸터                  |  (비움)
@@ -17,12 +18,16 @@ import '../styles/type.css';
 interface Props {
   title?: string;
   description?: string;
+  /** 화면 맨 위 검은 띠에 올릴 한 줄 */
+  notice?: string;
 }
 
-const { title, description } = Astro.props;
+const { title, description, notice } = Astro.props;
 const fullTitle = title ? `${title} — ${SITE_NAME}` : SITE_NAME;
 const isHome = (Astro.url.pathname.replace(/\/+$/, '') || '/') === '/';
 const socials = settings.socials ?? [];
+const copyright =
+  settings.copyright || `© ${new Date().getFullYear()} ${SITE_NAME}`;
 ---
 
 <!doctype html>
@@ -47,6 +52,8 @@ const socials = settings.socials ?? [];
   </head>
 
   <body>
+    {notice && <aside class="site-notice">{notice}</aside>}
+
     <main class="site">
       <header class="site-identity">
         {
@@ -80,15 +87,11 @@ const socials = settings.socials ?? [];
             </a>
           ))
         }
-        <small class="site-copyright">
-          © {new Date().getFullYear()} {SITE_NAME}
-        </small>
+        <small class="site-copyright">{copyright}</small>
+        <!-- 모바일에서만 보이는 인덱스 바로가기. 푸터 우측 끝에 붙는다 -->
+        <a class="index-shortcut section-label" href="#index">Index</a>
       </footer>
     </main>
-
-    <nav class="index-shortcut" aria-label="인덱스로 이동">
-      <a class="section-label" href="#index">Index</a>
-    </nav>
 
     <style>
       .site {
@@ -139,14 +142,13 @@ const socials = settings.socials ?? [];
       }
 
       /* 모바일은 접지 않고 인덱스를 문서 맨 위로 흘려보낸다.
-         푸터는 페이지 맨 아래에 놓이고, 인덱스로 돌아가는 한 줄은
-         화면 우측 하단에 고정된다 */
+         푸터는 페이지 맨 아래에 가로로 놓이고, 인덱스 바로가기는
+         그 푸터의 우측 끝에 붙는다 */
       @media (max-width: 720px) {
         .site {
           grid-template-columns: minmax(0, 1fr);
           grid-template-rows: none;
           row-gap: var(--gutter);
-          padding-bottom: calc(var(--tap-size) + var(--gutter) * 2);
         }
 
         .site-identity,
@@ -163,6 +165,7 @@ const socials = settings.socials ?? [];
 
         .site-footer {
           flex-direction: row;
+          align-items: baseline;
           flex-wrap: wrap;
           column-gap: 1.1em;
           padding-top: var(--gutter);
@@ -170,15 +173,8 @@ const socials = settings.socials ?? [];
         }
 
         .index-shortcut {
-          position: fixed;
-          inset: auto 0 0 0;
-          display: flex;
-          justify-content: flex-end;
-          align-items: center;
-          height: var(--tap-size);
-          padding: 0 var(--gutter);
-          background: var(--paper);
-          border-top: 1px solid var(--rule);
+          display: inline-block;
+          margin-left: auto;
         }
       }
 

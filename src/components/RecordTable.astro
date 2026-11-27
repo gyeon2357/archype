@@ -2,7 +2,9 @@
 /**
  * 사이트의 단 하나의 목록 조판.
  * Home의 활동 기록과 Artist 색인이 같은 표를 쓴다.
- * 페이지를 옮겨도 같은 문서를 넘기는 감각이 유지되는 장치다.
+ *
+ * 열 머리에 sortable을 주면 눌러서 정렬할 수 있고, 셀마다 따로
+ * 링크를 걸 수도 있다. 정렬은 아래 작은 스크립트가 맡는다.
  */
 export interface Column {
   /** rows의 cells에서 값을 꺼낼 키 */
@@ -15,18 +17,22 @@ export interface Column {
   noWrap?: boolean;
   /** 분류·장르처럼 성격을 표시하는 열 */
   isClassifier?: boolean;
+  /** 열 머리를 눌러 정렬할 수 있게 할 때 */
+  sortable?: boolean;
 }
 
 export interface Row {
-  /** 링크를 걸 주소. 없으면 글자만 놓인다 */
+  /** 기본 링크. linkKey로 지정한 열에 걸린다 */
   href?: string;
+  /** 열마다 다른 링크를 걸 때 — { artist: '/artist/soon' } */
+  hrefs?: Record<string, string | undefined>;
   cells: Record<string, string | number | null | undefined>;
 }
 
 interface Props {
   columns: Column[];
   rows: Row[];
-  /** 링크를 걸 열의 key. 기본값은 두 번째 열 */
+  /** 기본 링크를 걸 열의 key. 기본값은 두 번째 열 */
   linkKey?: string;
 }
 
@@ -50,12 +56,28 @@ function headClass(column: Column) {
 function cellText(value: string | number | null | undefined) {
   return value === null || value === undefined || value === '' ? '—' : String(value);
 }
+
+function cellHref(row: Row, column: Column) {
+  return row.hrefs?.[column.key] ?? (column.key === anchorKey ? row.href : undefined);
+}
 ---
 
 <table class="record-table">
   <thead>
     <tr>
-      {columns.map((column) => <th class={headClass(column)} scope="col">{column.label}</th>)}
+      {
+        columns.map((column, index) => (
+          <th class={headClass(column)} scope="col">
+            {column.sortable ? (
+              <button type="button" class="sort-button" data-column={index}>
+                {column.label}
+              </button>
+            ) : (
+              column.label
+            )}
+          </th>
+        ))
+      }
     </tr>
   </thead>
   <tbody>
@@ -63,18 +85,57 @@ function cellText(value: string | number | null | undefined) {
       rows.map((row) => (
         <tr>
           {
-            columns.map((column) => (
-              <td class={cellClass(column)}>
-                {row.href && column.key === anchorKey ? (
-                  <a href={row.href}>{cellText(row.cells[column.key])}</a>
-                ) : (
-                  cellText(row.cells[column.key])
-                )}
-              </td>
-            ))
+            columns.map((column) => {
+              const href = cellHref(row, column);
+              return (
+                <td class={cellClass(column)}>
+                  {href ? (
+                    <a href={href}>{cellText(row.cells[column.key])}</a>
+                  ) : (
+                    cellText(row.cells[column.key])
+                  )}
+                </td>
+              );
+            })
           }
         </tr>
       ))
     }
   </tbody>
 </table>
+
+<script>
+  // 열 머리를 누르면 그 열을 기준으로 행을 다시 늘어놓는다.
+  // 같은 열을 다시 누르면 방향이 뒤집힌다.
+  document.querySelectorAll<HTMLTableElement>('.record-table').forEach((table) => {
+    const body = table.querySelector('tbody');
+    if (!body) return;
+
+    table.querySelectorAll<HTMLButtonElement>('.sort-button').forEach((button) => {
+      button.addEventListener('click', () => {
+        const index = Number(button.dataset.column);
+        const descending = button.dataset.direction !== 'desc';
+
+        // 다른 열의 표시를 지운다
+        table.querySelectorAll<HTMLButtonElement>('.sort-button').forEach((other) => {
+          if (other !== button) {
+            delete other.dataset.direction;
+            other.removeAttribute('aria-sort');
+          }
+        });
+
+        button.dataset.direction = descending ? 'desc' : 'asc';
+        button.setAttribute('aria-sort', descending ? 'descending' : 'ascending');
+
+        const rows = Array.from(body.rows);
+        rows.sort((a, b) => {
+          const left = a.cells[index]?.textContent?.trim() ?? '';
+          const right = b.cells[index]?.textContent?.trim() ?? '';
+          const result = left.localeCompare(right, 'ko', { numeric: true });
+          return descending ? -result : result;
+        });
+        rows.forEach((row) => body.appendChild(row));
+      });
+    });
+  });
+</script>

@@ -192,6 +192,34 @@ img {
   padding-right: 0;
 }
 
+/* 정렬 가능한 열 머리. 버튼처럼 보이지 않게 글자만 남긴다 */
+.sort-button {
+  appearance: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.sort-button:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.22em;
+  text-decoration-thickness: 0.5px;
+}
+
+.sort-button[data-direction='asc']::after {
+  content: ' ↑';
+}
+
+.sort-button[data-direction='desc']::after {
+  content: ' ↓';
+}
+
 .col-number {
   width: 3.4em;
 }
@@ -239,10 +267,17 @@ img {
   margin-bottom: var(--row-padding);
 }
 
+/* 공지 띠 — 본문 칸 밖에서 화면 전체 너비를 쓴다 */
 .site-notice {
-  padding-bottom: var(--gutter);
-  margin-bottom: calc(var(--gutter) * 2);
-  border-bottom: 1px solid var(--rule);
+  width: 100%;
+  margin: 0;
+  padding: var(--row-padding) var(--gutter);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.site-notice a {
+  color: inherit;
 }
 
 .body-text {

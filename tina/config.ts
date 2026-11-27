@@ -141,6 +141,13 @@ export default defineConfig({
         fields: [
           { name: 'description', label: '사이트 설명', type: 'string' },
           {
+            name: 'shopLabel',
+            label: 'Shop 메뉴 이름',
+            type: 'string',
+            description:
+              '메뉴에 표시할 이름입니다. 비워 두면 Shop으로 나옵니다.',
+          },
+          {
             name: 'shopUrl',
             label: 'Shop 링크',
             type: 'string',
@@ -148,6 +155,13 @@ export default defineConfig({
               '메뉴의 Shop을 누르면 열리는 주소입니다. https:// 로 시작하는 외부 주소를 넣으면 새 창으로 열리고, 비워 두면 홈으로 이동합니다.',
           },
           { name: 'contactEmail', label: '대표 이메일', type: 'string' },
+          {
+            name: 'copyright',
+            label: '푸터 저작권 문구',
+            type: 'string',
+            description:
+              '비워 두면 © 연도 ARCHYPE 으로 자동 생성됩니다.',
+          },
           {
             name: 'socials',
             label: '링크',

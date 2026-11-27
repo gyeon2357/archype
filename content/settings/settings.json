@@ -1,7 +1,9 @@
 {
   "description": "아크하입 웹사이트",
+  "shopLabel": "Shop",
   "shopUrl": "/",
   "contactEmail": "archypeteam@gmail.com",
+  "copyright": "",
   "socials": [
     {
       "label": "Instagram",
