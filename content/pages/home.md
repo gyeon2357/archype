@@ -1,8 +1,6 @@
 ---
 title: Home
-notice: '(공지 한 줄을 Tina에서 입력하세요 — 릴리스, 입고, 전시 일정 등)'
-image: ''
-imageCaption: ''
+notice: Notice - Archype 2026. 12. 31.
 ---
 
 (필요하면 짧은 소개 문단을 여기에 둡니다. 비워 두면 표와 이미지만 남습니다.)
