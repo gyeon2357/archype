@@ -1,12 +1,11 @@
 ---
 name: Benni Gate
-no: 2
+'no': 2
 roles: []
 genres: []
-since: ''
+since: '2026'
 base: ''
 links: []
-profileImage: ''
 profileCaption: ''
 ---
 
