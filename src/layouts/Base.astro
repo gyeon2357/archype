@@ -2,13 +2,13 @@
 /**
  * 사이트 뼈대.
  *
- * 공지 띠는 격자 밖에서 화면 전체 너비를 쓴다.
+ * 공지 띠는 격자 밖에서 화면 전체 너비를 쓰고 모든 페이지에 깔린다.
  * 그 아래 데스크톱은 2열 3행 격자다.
  *   1행: 사이트 이름(ARCHYPE)  |  (비움)
  *   2행: 인덱스 메뉴           |  페이지 내용
  *   3행: 푸터                  |  (비움)
- * 본문의 첫 줄이 메뉴 첫 항목과 같은 행에서 시작하므로 둘의 윗선이 맞고,
- * 푸터는 화면 좌측 최하단에 붙는다.
+ * 남는 높이는 본문이 든 행이 혼자 가져간다. 그래야 내용이 많든 적든
+ * 워드마크와 메뉴가 늘 같은 자리에 서고 푸터만 아래에 붙는다.
  */
 import SiteIndex from '../components/SiteIndex.astro';
 import settings from '../../content/settings/settings.json';
@@ -18,16 +18,17 @@ import '../styles/type.css';
 interface Props {
   title?: string;
   description?: string;
-  /** 화면 맨 위 검은 띠에 올릴 한 줄 */
-  notice?: string;
 }
 
-const { title, description, notice } = Astro.props;
+const { title, description } = Astro.props;
 const fullTitle = title ? `${title} — ${SITE_NAME}` : SITE_NAME;
 const isHome = (Astro.url.pathname.replace(/\/+$/, '') || '/') === '/';
 const socials = settings.socials ?? [];
 const copyright =
   settings.copyright || `© ${new Date().getFullYear()} ${SITE_NAME}`;
+const notice = settings.notice ?? '';
+const noticeUrl = settings.noticeUrl ?? '';
+const noticeIsExternal = /^https?:\/\//.test(noticeUrl);
 ---
 
 <!doctype html>
@@ -52,7 +53,62 @@ const copyright =
   </head>
 
   <body>
-    {notice && <aside class="site-notice">{notice}</aside>}
+    {
+      notice && (
+        <aside class="site-notice" id="site-notice" data-notice={notice}>
+          {noticeUrl ? (
+            <a
+              class="site-notice-text"
+              href={noticeUrl}
+              target={noticeIsExternal ? '_blank' : undefined}
+              rel={noticeIsExternal ? 'noopener noreferrer' : undefined}
+            >
+              {notice}
+            </a>
+          ) : (
+            <span class="site-notice-text">{notice}</span>
+          )}
+          <button type="button" class="site-notice-close section-label" id="site-notice-close">
+            Close
+          </button>
+        </aside>
+      )
+    }
+
+    <script is:inline>
+      /* 닫은 공지는 하루 동안 다시 띄우지 않는다.
+         공지 문구가 바뀌면 저장값과 달라져 다시 나타난다.
+         요소 바로 뒤에서 실행되므로 깜빡임 없이 숨겨진다. */
+      (function () {
+        var bar = document.getElementById('site-notice');
+        if (!bar) return;
+        var KEY = 'archype-notice';
+        var DAY = 24 * 60 * 60 * 1000;
+        var current = bar.getAttribute('data-notice') || '';
+        try {
+          var saved = JSON.parse(localStorage.getItem(KEY) || 'null');
+          if (saved && saved.text === current && Date.now() < saved.until) {
+            bar.hidden = true;
+          }
+        } catch (error) {
+          /* 로컬스토리지를 못 쓰면 그냥 띄운다 */
+        }
+        var close = document.getElementById('site-notice-close');
+        if (close) {
+          close.addEventListener('click', function () {
+            bar.hidden = true;
+            try {
+              localStorage.setItem(
+                KEY,
+                JSON.stringify({ text: current, until: Date.now() + DAY })
+              );
+            } catch (error) {
+              /* 저장이 안 되면 이번 방문에만 숨긴다 */
+            }
+          });
+        }
+      })();
+    </script>
 
     <main class="site">
       <header class="site-identity">
@@ -107,6 +163,7 @@ const copyright =
         padding: var(--gutter);
         min-height: 100vh;
         align-items: start;
+        align-content: start;
         /* 메뉴를 펼쳤을 때 브라우저가 스크롤을 보정하면서
            화면이 위로 미끄러지는 것을 막는다 */
         overflow-anchor: none;
@@ -158,28 +215,31 @@ const copyright =
       }
 
       /* 모바일은 접지 않고 인덱스를 문서 맨 위로 흘려보낸다.
-         푸터는 페이지 맨 아래에 가로로 놓이고, 인덱스 바로가기는
-         그 푸터의 우측 끝에 붙는다 */
+         본문이 든 행만 남는 높이를 가져가므로 워드마크와 메뉴는
+         내용 양과 무관하게 제자리에 선다 */
       @media (max-width: 720px) {
         .site {
           grid-template-columns: minmax(0, 1fr);
-          grid-template-rows: none;
+          grid-template-rows: auto auto 1fr auto;
           row-gap: var(--gutter);
         }
 
-        .site-identity,
-        .site-index,
-        .site-content,
-        .site-footer {
-          grid-area: auto;
+        .site-identity {
+          grid-area: 1 / 1;
         }
 
         .site-index {
+          grid-area: 2 / 1;
           padding-bottom: var(--gutter);
           border-bottom: 1px solid var(--rule);
         }
 
+        .site-content {
+          grid-area: 3 / 1;
+        }
+
         .site-footer {
+          grid-area: 4 / 1;
           flex-direction: row;
           align-items: baseline;
           flex-wrap: wrap;

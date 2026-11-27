@@ -98,12 +98,6 @@ export default defineConfig({
         },
         fields: [
           {
-            name: 'notice',
-            label: '공지 한 줄',
-            type: 'string',
-            description: 'Home 맨 위에 노출됩니다. 비우면 그 줄이 사라집니다.',
-          },
-          {
             name: 'image',
             label: '이미지',
             type: 'image',
@@ -140,6 +134,20 @@ export default defineConfig({
         },
         fields: [
           { name: 'description', label: '사이트 설명', type: 'string' },
+          {
+            name: 'notice',
+            label: '공지 문구',
+            type: 'string',
+            description:
+              '모든 페이지 맨 위 검은 띠에 한 줄로 나옵니다. 비워 두면 띠가 통째로 사라집니다. 방문자가 Close를 누르면 하루 동안 보이지 않고, 문구를 바꾸면 다시 나타납니다.',
+          },
+          {
+            name: 'noticeUrl',
+            label: '공지 링크',
+            type: 'string',
+            description:
+              '공지를 눌렀을 때 열릴 주소입니다. https:// 로 시작하면 새 창으로 열리고, 비워 두면 링크 없이 글자만 놓입니다.',
+          },
           {
             name: 'shopLabel',
             label: 'Shop 메뉴 이름',

@@ -38,7 +38,6 @@ const home = defineCollection({
   loader: glob({ pattern: 'index.md', base: './content/home' }),
   schema: z.object({
     title: z.string().optional(),
-    notice: z.string().optional(),
     /** Home 우측 하단에 작게 놓이는 이미지 */
     image: z.string().optional(),
     imageCaption: z.string().optional(),

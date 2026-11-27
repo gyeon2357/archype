@@ -267,17 +267,49 @@ img {
   margin-bottom: var(--row-padding);
 }
 
-/* 공지 띠 — 본문 칸 밖에서 화면 전체 너비를 쓴다 */
+/* 공지 띠 — 본문 칸 밖에서 화면 전체 너비를 쓴다.
+   우측 끝의 Close를 누르면 하루 동안 숨는다 */
 .site-notice {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.2em;
   width: 100%;
   margin: 0;
-  padding: var(--row-padding) var(--gutter);
+  padding: 2px var(--gutter) 3px;
+  line-height: 1.45;
   background: var(--ink);
   color: var(--paper);
 }
 
+.site-notice[hidden] {
+  display: none;
+}
+
 .site-notice a {
   color: inherit;
+}
+
+.site-notice-text {
+  min-width: 0;
+}
+
+.site-notice-close {
+  flex: 0 0 auto;
+  appearance: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.site-notice-close:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.22em;
+  text-decoration-thickness: 0.5px;
 }
 
 .body-text {
