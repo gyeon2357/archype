@@ -202,6 +202,17 @@ img {
   cursor: default;
 }
 
+/* 줄바꿈 표 — 자르지 않고 접는다. 대신 글줄 사이를 좁혀
+   여러 줄이 한 덩어리로 읽히게 한다 */
+.record-table--wrap td {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  overflow-wrap: anywhere; /* 띄어쓰기 없는 긴 제목이 열을 넘지 않게 */
+  line-height: var(--line-height-tight);
+  cursor: auto;
+}
+
 /* 펼친 셀은 줄바꿈을 허용한다 */
 .record-table td.is-expanded {
   white-space: normal;
@@ -369,9 +380,16 @@ figcaption {
     --gutter: 14px;
   }
 
+  /* 열 사이를 좁혀 정렬 화살표가 옆 열을 밀지 않게 한다 */
+  .record-table th,
+  .record-table td {
+    padding-right: 0.8em;
+  }
+
   /* 우측 끝 열(분류)은 오른쪽에 붙인다 */
   .record-table th:last-child,
   .record-table td:last-child {
+    padding-right: 0;
     text-align: right;
   }
 

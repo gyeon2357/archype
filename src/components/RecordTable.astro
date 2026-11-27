@@ -44,9 +44,11 @@ interface Props {
   rows: Row[];
   /** 기본 링크를 걸 열의 key. 기본값은 두 번째 열 */
   linkKey?: string;
+  /** 넘치는 셀을 말줄임표로 자르지 않고 줄바꿈한다 */
+  wrap?: boolean;
 }
 
-const { columns, rows, linkKey } = Astro.props;
+const { columns, rows, linkKey, wrap } = Astro.props;
 const anchorKey = linkKey ?? columns[1]?.key ?? columns[0]?.key;
 
 function cellClass(column: Column) {
@@ -65,7 +67,7 @@ function cellHref(row: Row, column: Column) {
 }
 ---
 
-<table class="record-table">
+<table class:list={['record-table', wrap && 'record-table--wrap']}>
   <thead>
     <tr>
       {
