@@ -1,5 +1,4 @@
 ---
-title: Contact
 ---
 
 (연락처 안내를 Tina에서 입력하세요.)

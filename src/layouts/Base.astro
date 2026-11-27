@@ -11,6 +11,7 @@
  */
 import SiteIndex from '../components/SiteIndex.astro';
 import settings from '../../content/settings/settings.json';
+import { SITE_NAME } from '../site';
 import '../styles/type.css';
 
 interface Props {
@@ -19,7 +20,7 @@ interface Props {
 }
 
 const { title, description } = Astro.props;
-const fullTitle = title ? `${title} — ${settings.siteName}` : settings.siteName;
+const fullTitle = title ? `${title} — ${SITE_NAME}` : SITE_NAME;
 const isHome = (Astro.url.pathname.replace(/\/+$/, '') || '/') === '/';
 const socials = settings.socials ?? [];
 ---
@@ -52,12 +53,12 @@ const socials = settings.socials ?? [];
           isHome ? (
             <h1>
               <a class="site-name" href="/">
-                {settings.siteName}
+                {SITE_NAME}
               </a>
             </h1>
           ) : (
             <a class="site-name" href="/">
-              {settings.siteName}
+              {SITE_NAME}
             </a>
           )
         }
@@ -80,7 +81,7 @@ const socials = settings.socials ?? [];
           ))
         }
         <small class="site-copyright">
-          © {new Date().getFullYear()} {settings.siteName}
+          © {new Date().getFullYear()} {SITE_NAME}
         </small>
       </footer>
     </main>

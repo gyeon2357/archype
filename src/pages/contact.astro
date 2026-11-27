@@ -3,7 +3,7 @@ import { getEntry, render } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import settings from '../../content/settings/settings.json';
 
-const contact = await getEntry('pages', 'contact');
+const contact = await getEntry('contact', 'index');
 const { Content } = contact ? await render(contact) : { Content: null };
 const socials = settings.socials ?? [];
 ---

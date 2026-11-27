@@ -4,7 +4,7 @@ import Base from '../layouts/Base.astro';
 import RecordTable from '../components/RecordTable.astro';
 import type { Column, Row } from '../components/RecordTable.astro';
 
-const home = await getEntry('pages', 'home');
+const home = await getEntry('home', 'index');
 const { Content } = home ? await render(home) : { Content: null };
 
 const artists = (await getCollection('artists')).sort(

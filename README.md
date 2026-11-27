@@ -22,9 +22,10 @@ Pretendard 서브셋에는 한글 2,780자가 들어 있습니다. 희귀 음절
 
 ```
 content/            Tina가 읽고 쓰는 콘텐츠. git에 그대로 커밋됩니다
-  artists/*.md      아티스트 여덟 명
-  pages/*.md        Home 공지와 이미지, Contact
-  settings/*.json   사이트 이름, Shop 링크, SNS 링크
+  artists/*.md      아티스트 여덟 명. 유일하게 목록으로 다루는 컬렉션
+  home/index.md     Home 공지와 이미지
+  contact/index.md  Contact 본문
+  settings/*.json   Shop 링크, SNS 링크, 사이트 설명
 src/
   layouts/Base.astro          2열 2행 격자. 1행은 사이트 이름, 2행은 메뉴와 본문
   components/
@@ -51,9 +52,15 @@ tina/tina-lock.json           TinaCloud가 브랜치를 색인하는 데 쓰는 
 
 메뉴를 접지 않고 문서 맨 위로 흘려보냅니다. 아티스트 목록은 한 줄로 이어지고 번호는 숨겨서 메뉴가 차지하는 높이를 줄입니다. 푸터는 페이지 맨 아래에 놓이고, 인덱스로 돌아가는 한 줄은 화면 우측 하단에 고정됩니다. 햄버거 아이콘은 쓰지 않습니다.
 
+## CMS 구조
+
+Tina 사이드바에서 아티스트만 목록으로 다루고, Home·Contact·Settings는 문서 하나짜리라 **Site** 아래에 지구본 아이콘으로 놓여 목록을 거치지 않고 바로 열립니다. `ui.global: true`로 지정한 결과이고 tinacms 3.9.4 이상에서 동작합니다. 문서가 없거나 둘 이상이면 일반 목록으로 되돌아가니, 각 폴더에 파일을 하나만 두세요.
+
+사이트 이름은 CMS에서 빼고 `src/site.ts`의 `SITE_NAME` 상수로 두었습니다.
+
 ## Shop
 
-사이트 안에 상품 페이지를 두지 않습니다. 메뉴의 Shop은 `content/settings/settings.json`의 `shopUrl`로 연결되고, `https://`로 시작하는 주소를 넣으면 새 창으로 열립니다. 비워 두면 홈으로 이동합니다.
+사이트 안에 상품 페이지를 두지 않습니다. 메뉴의 Shop은 Tina의 **Settings → Shop 링크**(`settings.json`의 `shopUrl`)로 연결되고, `https://`로 시작하는 주소를 넣으면 새 창으로 열립니다. 비워 두면 홈으로 이동합니다.
 
 ## 이미지
 

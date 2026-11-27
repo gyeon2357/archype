@@ -24,6 +24,7 @@ export default defineConfig({
 
   schema: {
     collections: [
+      /* 목록으로 다루는 유일한 컬렉션 */
       {
         name: 'artist',
         label: 'Artist',
@@ -81,56 +82,54 @@ export default defineConfig({
             label: '프로필 이미지',
             type: 'image',
             description:
-              '인물 사진 한 장. 비워 두면 사이트에 자리표시자가 보입니다. 지우려면 이미지 옆의 ✕를 누르세요.',
+              '인물 사진 한 장. 비워 두면 회색 자리가 보입니다. 지우려면 이미지 옆의 ✕를 누르세요.',
           },
-          {
-            name: 'profileCaption',
-            label: '프로필 캡션',
-            type: 'string',
-          },
-          {
-            name: 'body',
-            label: '소개',
-            type: 'rich-text',
-            isBody: true,
-          },
+          { name: 'profileCaption', label: '프로필 캡션', type: 'string' },
+          { name: 'body', label: '소개', type: 'rich-text', isBody: true },
         ],
       },
 
+      /* 아래 셋은 문서 하나짜리라 사이드바의 Site 아래에서 바로 열린다 */
       {
-        name: 'page',
-        label: 'Page',
-        path: 'content/pages',
+        name: 'home',
+        label: 'Home',
+        path: 'content/home',
         format: 'md',
         ui: {
+          global: true,
           allowedActions: { create: false, delete: false },
+          router: () => '/',
         },
         fields: [
-          {
-            name: 'title',
-            label: '제목',
-            type: 'string',
-            isTitle: true,
-            required: true,
-          },
           {
             name: 'notice',
             label: '공지 한 줄',
             type: 'string',
-            description: 'Home 상단에 노출됩니다.',
+            description: 'Home 맨 위에 노출됩니다. 비우면 그 줄이 사라집니다.',
           },
           {
             name: 'image',
             label: '이미지',
             type: 'image',
             description:
-              'Home 우측 하단에 작게 놓입니다. 비워 두면 자리표시자가 보이고, 지우려면 이미지 옆의 ✕를 누르세요.',
+              'Home 우측 하단에 작게 놓입니다. 비워 두면 회색 자리가 보이고, 지우려면 이미지 옆의 ✕를 누르세요.',
           },
-          {
-            name: 'imageCaption',
-            label: '이미지 캡션',
-            type: 'string',
-          },
+          { name: 'imageCaption', label: '이미지 캡션', type: 'string' },
+          { name: 'body', label: '본문', type: 'rich-text', isBody: true },
+        ],
+      },
+
+      {
+        name: 'contact',
+        label: 'Contact',
+        path: 'content/contact',
+        format: 'md',
+        ui: {
+          global: true,
+          allowedActions: { create: false, delete: false },
+          router: () => '/contact',
+        },
+        fields: [
           { name: 'body', label: '본문', type: 'rich-text', isBody: true },
         ],
       },
@@ -141,23 +140,17 @@ export default defineConfig({
         path: 'content/settings',
         format: 'json',
         ui: {
+          global: true,
           allowedActions: { create: false, delete: false },
         },
         fields: [
-          {
-            name: 'siteName',
-            label: '사이트 이름',
-            type: 'string',
-            isTitle: true,
-            required: true,
-          },
           { name: 'description', label: '사이트 설명', type: 'string' },
           {
             name: 'shopUrl',
             label: 'Shop 링크',
             type: 'string',
             description:
-              '메뉴의 Shop이 연결될 주소입니다. 외부 주소(https://로 시작)를 넣으면 새 창으로 열립니다. 비워 두면 홈으로 이동합니다.',
+              '메뉴의 Shop을 누르면 열리는 주소입니다. https:// 로 시작하는 외부 주소를 넣으면 새 창으로 열리고, 비워 두면 홈으로 이동합니다.',
           },
           { name: 'contactEmail', label: '대표 이메일', type: 'string' },
           {
@@ -165,7 +158,7 @@ export default defineConfig({
             label: '링크',
             type: 'object',
             list: true,
-            description: '메뉴 하단에 순서대로 노출됩니다.',
+            description: '푸터에 순서대로 노출됩니다.',
             ui: { itemProps: (item) => ({ label: item?.label }) },
             fields: [
               { name: 'label', label: '이름', type: 'string' },

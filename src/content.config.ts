@@ -32,10 +32,12 @@ const artists = defineCollection({
   }),
 });
 
-const pages = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './content/pages' }),
+/* Home과 Contact는 각각 문서 하나짜리 컬렉션이다.
+   Tina에서 목록을 거치지 않고 바로 열리도록 폴더를 나눠 두었다. */
+const home = defineCollection({
+  loader: glob({ pattern: 'index.md', base: './content/home' }),
   schema: z.object({
-    title: z.string(),
+    title: z.string().optional(),
     notice: z.string().optional(),
     /** Home 우측 하단에 작게 놓이는 이미지 */
     image: z.string().optional(),
@@ -43,4 +45,11 @@ const pages = defineCollection({
   }),
 });
 
-export const collections = { artists, pages };
+const contact = defineCollection({
+  loader: glob({ pattern: 'index.md', base: './content/contact' }),
+  schema: z.object({
+    title: z.string().optional(),
+  }),
+});
+
+export const collections = { artists, home, contact };
