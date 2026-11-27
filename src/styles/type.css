@@ -1,0 +1,320 @@
+/* ===========================================================
+   ARCHYPE — 조판 시스템
+   원칙: 글자 크기는 두 단계만 쓴다. 위계는 크기가 아니라
+   대소문자 · 자간 · 명도 · 이탤릭 · 여백으로만 만든다.
+   =========================================================== */
+
+/* Pretendard Regular 한 종만 쓴다. 굵기가 하나뿐이라
+   위계를 굵기로 만들 수 없고, 그것이 이 사이트의 전제와 맞는다.
+   서브셋에 한글 2,780자가 들어 있어 일상적인 범위는 덮지만
+   희귀 음절은 아래 폴백으로 넘어간다. */
+@font-face {
+  font-family: 'Pretendard';
+  src:
+    url('/fonts/Pretendard-Regular.subset.woff2') format('woff2'),
+    url('/fonts/Pretendard-Regular.subset.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* 크기는 둘뿐이다. 세 번째를 추가하지 않는다. */
+  --fs: 12px;      /* 본문 겸 캡션. 한글 가독 하한을 고려한 값 */
+  --fs-sm: 10.5px; /* 라틴 전용 라벨·번호·메타. 한글에 쓰지 않는다 */
+
+  --lh: 1.65;
+  --lh-tight: 1.45;
+
+  /* 위계를 담당하는 명도 단계 */
+  --ink: #111111;
+  --ink-60: rgba(17, 17, 17, 0.6);
+  --ink-38: rgba(17, 17, 17, 0.38);
+  --rule: rgba(17, 17, 17, 0.16);
+  --paper: #ffffff;
+
+  --sidebar-w: 200px;
+  --pad: 18px;
+  --row-y: 7px;
+
+  --tracking-label: 0.09em;
+  --tap: 30px; /* 모바일 탭 타겟 최소 높이 */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #ededed;
+    --ink-60: rgba(237, 237, 237, 0.6);
+    --ink-38: rgba(237, 237, 237, 0.38);
+    --rule: rgba(237, 237, 237, 0.18);
+    --paper: #0d0d0d;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic',
+    'Helvetica Neue', Arial, sans-serif;
+  font-size: var(--fs);
+  line-height: var(--lh);
+  font-weight: 400;
+  /* 한글이 단어 중간에서 잘리지 않게 한다 */
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  font-kerning: normal;
+  /* Regular 한 종만 올렸으므로 가짜 볼드는 막고, 기울임은 허용한다.
+     .ital을 분류 표시 채널로 쓰고 있어서 style 합성만 남긴다.
+     기계적으로 기울인 한글이 거슬리면 이 값을 none으로 바꾸고
+     .ital 대신 자간과 명도로 그 채널을 대체하면 된다. */
+  font-synthesis: style;
+}
+
+/* 굵기로 강조하지 않는다. 마크다운의 ** ** 도 본문과 같은 굵기로 둔다. */
+strong,
+b {
+  font-weight: 400;
+}
+
+/* 제목 태그도 본문과 같은 크기로 둔다. 의미만 남기고 대비는 없앤다. */
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  font-size: inherit;
+  font-weight: 400;
+  line-height: var(--lh-tight);
+}
+
+p {
+  margin: 0 0 0.9em;
+  max-width: 48em;
+}
+
+p:last-child {
+  margin-bottom: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.22em;
+  text-decoration-thickness: 0.5px;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--rule);
+  margin: var(--pad) 0;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* -----------------------------------------------------------
+   위계를 담당하는 유틸리티. 크기를 바꾸는 건 .label 하나뿐이고,
+   그것도 라틴 대문자에만 쓴다.
+   ----------------------------------------------------------- */
+
+.label {
+  font-size: var(--fs-sm);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+  color: var(--ink-60);
+}
+
+.meta {
+  color: var(--ink-60);
+}
+
+.dim {
+  color: var(--ink-38);
+}
+
+.ital {
+  font-style: italic;
+}
+
+.num {
+  font-size: var(--fs-sm);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  color: var(--ink-38);
+}
+
+/* 버튼은 버튼처럼 보이지 않게 한다. 대괄호가 기능을 알린다. */
+.btn {
+  display: inline-block;
+  min-height: var(--tap);
+  line-height: var(--tap);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: var(--fs-sm);
+}
+
+.btn::before {
+  content: '[';
+}
+
+.btn::after {
+  content: ']';
+}
+
+.btn:hover {
+  text-decoration: none;
+  color: var(--ink-60);
+}
+
+.sold {
+  color: var(--ink-38);
+  text-decoration: line-through;
+  text-decoration-thickness: 0.5px;
+}
+
+/* -----------------------------------------------------------
+   인덱스 표 — Home · Artist · Shop이 공유하는 단 하나의 조판
+   ----------------------------------------------------------- */
+
+table.index {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+}
+
+table.index th {
+  font-size: var(--fs-sm);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+  color: var(--ink-38);
+  text-align: left;
+  padding: 0 1.2em var(--row-y) 0;
+  border-bottom: 1px solid var(--rule);
+  white-space: nowrap;
+}
+
+table.index td {
+  padding: var(--row-y) 1.2em var(--row-y) 0;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: baseline;
+}
+
+table.index td:last-child,
+table.index th:last-child {
+  padding-right: 0;
+}
+
+table.index tbody tr:hover td {
+  color: var(--ink-60);
+}
+
+table.index tbody tr:hover td a {
+  text-decoration: underline;
+  text-underline-offset: 0.22em;
+  text-decoration-thickness: 0.5px;
+}
+
+table.index .c-no {
+  width: 3em;
+}
+
+table.index .c-nowrap {
+  white-space: nowrap;
+}
+
+/* 스펙 표 — 상품 상세의 사양. 인덱스 표와 같은 규칙을 쓴다. */
+table.spec {
+  border-collapse: collapse;
+  width: 100%;
+  max-width: 30em;
+}
+
+table.spec th {
+  font-size: var(--fs-sm);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+  color: var(--ink-38);
+  text-align: left;
+  white-space: nowrap;
+  width: 8em;
+  padding: var(--row-y) 1.2em var(--row-y) 0;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: baseline;
+}
+
+table.spec td {
+  padding: var(--row-y) 0;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: baseline;
+}
+
+/* -----------------------------------------------------------
+   섹션 · 블록
+   ----------------------------------------------------------- */
+
+.block {
+  margin-bottom: calc(var(--pad) * 2.2);
+}
+
+.block:last-child {
+  margin-bottom: 0;
+}
+
+.block > .label {
+  display: block;
+  margin-bottom: var(--row-y);
+}
+
+.notice {
+  padding-bottom: var(--pad);
+  margin-bottom: calc(var(--pad) * 2);
+  border-bottom: 1px solid var(--rule);
+}
+
+.prose {
+  max-width: 44em;
+}
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--pad);
+}
+
+.gallery figcaption {
+  margin-top: 5px;
+  color: var(--ink-60);
+}
+
+@media (max-width: 720px) {
+  :root {
+    --pad: 14px;
+  }
+}

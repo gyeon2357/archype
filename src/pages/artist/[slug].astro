@@ -1,0 +1,83 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import MetaBlock from '../../components/MetaBlock.astro';
+import IndexTable from '../../components/IndexTable.astro';
+import type { Column, Row } from '../../components/IndexTable.astro';
+
+export async function getStaticPaths() {
+  const artists = await getCollection('artists');
+  return artists.map((artist) => ({
+    params: { slug: artist.id },
+    props: { artist },
+  }));
+}
+
+const { artist } = Astro.props;
+const { Content } = await render(artist);
+const data = artist.data;
+
+const workColumns: Column[] = [
+  { key: 'year', label: 'Year', no: true },
+  { key: 'title', label: 'Work' },
+  { key: 'type', label: 'Type', ital: true, dim: true, nowrap: true },
+];
+
+const workRows: Row[] = [...data.works]
+  .sort((a, b) => (b.year ?? '').localeCompare(a.year ?? ''))
+  .map((work) => ({
+    href: work.url || undefined,
+    cells: { year: work.year, title: work.title, type: work.type },
+  }));
+---
+
+<Base title={data.name}>
+  <article>
+    <!-- 이름도 본문과 같은 크기로 둔다. 위계는 위치와 여백이 만든다. -->
+    <h1 class="block">{data.name}</h1>
+
+    <MetaBlock
+      items={[
+        { label: 'No', value: String(data.no).padStart(2, '0') },
+        { label: 'Role', value: data.roles.join(', ') },
+        { label: 'Genre', value: data.genres.join(', ') },
+        { label: 'Since', value: data.since },
+        { label: 'Base', value: data.base },
+        ...data.links.map((link) => ({
+          label: link.label,
+          value: link.url.replace(/^https?:\/\//, ''),
+          url: link.url,
+        })),
+      ]}
+    />
+
+    <div class="block prose">
+      <Content />
+    </div>
+
+    {
+      workRows.length > 0 && (
+        <section class="block">
+          <span class="label">Works</span>
+          <IndexTable columns={workColumns} rows={workRows} linkKey="title" />
+        </section>
+      )
+    }
+
+    {
+      data.images.length > 0 && (
+        <section class="block">
+          <span class="label">Images</span>
+          <div class="gallery">
+            {data.images.map((image) => (
+              <figure>
+                <img src={image.src} alt={image.caption ?? data.name} loading="lazy" />
+                {image.caption && <figcaption>{image.caption}</figcaption>}
+              </figure>
+            ))}
+          </div>
+        </section>
+      )
+    }
+  </article>
+</Base>

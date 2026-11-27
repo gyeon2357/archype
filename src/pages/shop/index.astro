@@ -1,0 +1,40 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import IndexTable from '../../components/IndexTable.astro';
+import type { Column, Row } from '../../components/IndexTable.astro';
+import { statusLabel, isPast, price, pad } from '../../lib/format';
+
+/* 품절 상품을 내리지 않는다. 목록이 쌓일수록 아카이브로 읽히고,
+   지난 상품도 아티스트의 활동 기록으로 기능한다. */
+const products = (await getCollection('products')).sort(
+  (a, b) => b.data.no - a.data.no
+);
+
+const columns: Column[] = [
+  { key: 'no', label: 'No', no: true },
+  { key: 'title', label: 'Item' },
+  { key: 'artist', label: 'Artist', nowrap: true, dim: true },
+  { key: 'price', label: 'Price (KRW)', nowrap: true },
+  { key: 'status', label: 'Status', nowrap: true, ital: true, dim: true },
+];
+
+const rows: Row[] = products.map((product) => ({
+  href: `/shop/${product.id}`,
+  muted: isPast(product.data.status),
+  cells: {
+    no: pad(product.data.no),
+    title: product.data.title,
+    artist: product.data.artist,
+    price: price(product.data.price),
+    status: statusLabel[product.data.status],
+  },
+}));
+---
+
+<Base title="Shop">
+  <section class="block">
+    <span class="label">Shop Index</span>
+    <IndexTable columns={columns} rows={rows} linkKey="title" />
+  </section>
+</Base>
