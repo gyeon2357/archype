@@ -13,6 +13,14 @@
 
 한글 조판에서 두 가지를 건드리지 마세요. `word-break: keep-all`은 한글이 단어 중간에서 잘리는 것을 막고, `line-height: 1.65`는 12px에서 읽히게 만드는 최소값입니다.
 
+### 서체
+
+Pretendard Regular 서브셋 한 종만 씁니다 (`public/fonts/`). 굵기가 하나뿐이라 위계를 굵기로 만들 수 없고, 그 제약이 이 사이트의 전제와 맞습니다.
+
+- 서브셋에 한글 2,780자가 들어 있습니다. 일상적인 범위는 덮지만 희귀 음절(예: `웱`)은 폴백 서체로 넘어가니, 아티스트명이나 상품명에서 어긋나는 글자가 보이면 해당 글자를 포함해 다시 서브셋하세요.
+- `font-synthesis: style` — 가짜 볼드는 막고 기울임 합성만 남겼습니다. `.ital`을 분류 표시 채널로 쓰기 때문입니다. 기계적으로 기울인 한글이 거슬리면 `none`으로 바꾸고 `.ital` 대신 자간과 명도로 그 채널을 대체하세요.
+- `strong`, `b`도 400으로 눌러 뒀습니다. 마크다운에서 `**강조**`를 써도 본문과 같은 굵기로 나옵니다.
+
 ## 구조
 
 ```
@@ -44,28 +52,40 @@ npm run build:site # Astro만 빌드 (Tina 자격증명 없이도 통과)
 npm run build      # Tina 어드민까지 함께 빌드
 ```
 
-## Tina Cloud 연결
+## Tina CMS 연결 순서
 
-1. [app.tina.io](https://app.tina.io)에서 이 저장소로 프로젝트를 만듭니다.
-2. Client ID와 Read-only Token을 받아 환경변수로 넣습니다.
+순서를 지켜야 하는 이유는, Tina Cloud가 저장소를 먼저 보고 Client ID를 발급하고, 그 값이 있어야 빌드가 어드민을 만들 수 있기 때문입니다.
 
-```
-TINA_PUBLIC_CLIENT_ID=...
-TINA_TOKEN=...
-TINA_BRANCH=main
-```
+1. **이 PR을 `main`에 머지합니다.** Tina Cloud는 지정한 브랜치의 `tina/config.ts`를 읽으므로 코드가 `main`에 있어야 합니다.
+2. **[app.tina.io](https://app.tina.io)에 GitHub 계정으로 로그인**하고 새 프로젝트를 만듭니다. 기존 저장소를 가져오는 쪽을 고르고 `gyeon2357/archype`를 지정합니다.
+3. **Tina의 GitHub App 설치를 승인**합니다. 권한은 이 저장소 하나로만 한정하세요. 전체 저장소 접근을 줄 필요가 없습니다.
+4. 브랜치를 `main`으로 지정합니다.
+5. **Client ID를 복사**합니다. 공개되어도 되는 값입니다.
+6. **토큰을 발급**합니다 (Tokens 또는 API Keys 쪽). 이쪽은 비밀값이니 저장소에 커밋하지 마세요. `.env`는 이미 `.gitignore`에 들어 있습니다.
+7. 로컬에 `.env`를 만들고 세 값을 넣습니다.
 
-무료 플랜은 편집자 2명, 월 대역폭 100GB, 에셋 개당 100MB입니다. 편집자를 더 늘려야 하면 Decap이나 Sveltia 같은 깃 기반 CMS로 교체하는 쪽이 비용이 맞습니다.
+   ```
+   TINA_PUBLIC_CLIENT_ID=...
+   TINA_TOKEN=...
+   TINA_BRANCH=main
+   ```
+
+8. `npm run dev` → `http://localhost:4321/admin/index.html`에서 편집기가 뜨는지 확인합니다. 로컬에서는 파일에 직접 저장되므로 커밋은 직접 해야 합니다.
+9. **Cloudflare Pages 프로젝트를 만들고** 이 저장소를 연결합니다. 빌드 명령 `npm run build`, 출력 디렉터리 `dist`, 환경변수로 위 세 값을 등록합니다.
+10. 배포된 주소의 `/admin/index.html`로 들어가 GitHub 로그인 후 편집합니다. 저장하면 Tina Cloud가 `main`에 커밋하고, Cloudflare가 그 푸시를 받아 재빌드합니다. 즉시 반영이 아니라 빌드 시간만큼 걸립니다.
+11. 편집자를 한 명 더 초대합니다. Tina Cloud 프로젝트의 Collaborators에 추가하면 됩니다.
+
+무료 플랜은 편집자 2명, 역할 3개, 월 대역폭 100GB, 에셋 개당 100MB입니다. 편집자를 더 늘려야 하면 Decap이나 Sveltia 같은 깃 기반 CMS로 교체하는 쪽이 비용이 맞습니다.
+
+### 자격증명 없이 빌드하기
+
+`npm run build:site`는 Astro만 돌리므로 Tina 자격증명이 없어도 통과합니다. 레이아웃만 확인할 때 쓰세요.
 
 ## 배포
 
-Cloudflare Pages에 이 저장소를 연결합니다.
+Cloudflare Pages를 씁니다. 상업적 사용이 허용되고 대역폭 제한이 없습니다.
 
-- 빌드 명령: `npm run build`
-- 출력 디렉터리: `dist`
-- 환경변수: 위 세 개
-
-Vercel Hobby는 상업적 사용이 금지되어 있으니 상품을 판매하는 이 사이트에는 쓰지 않습니다.
+GitHub Pages는 쓸 수 없습니다. 온라인 비즈니스나 전자상거래 사이트의 무료 호스팅으로 쓰는 것이 금지되어 있어서, Shop이 있는 이 사이트는 해당됩니다. Vercel Hobby도 비상업적 개인 용도로만 제한되어 있어 제외됩니다.
 
 ## 주문
 

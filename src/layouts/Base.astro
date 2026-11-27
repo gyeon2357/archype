@@ -26,6 +26,13 @@ const section = path.startsWith('/artist')
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/Pretendard-Regular.subset.woff2"
+      crossorigin
+    />
     <title>{fullTitle}</title>
     <meta name="description" content={description ?? settings.description ?? ''} />
     <meta property="og:title" content={fullTitle} />

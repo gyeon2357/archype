@@ -83,7 +83,9 @@ const orderable = !isPast(data.status) && orderUrl !== '';
         ) : isPast(data.status) ? (
           <span class="btn sold">{statusLabel[data.status]}</span>
         ) : (
-          <span class="btn dim">Order form not set</span>
+          /* 주문 폼 링크를 받기 전까지 비활성 버튼으로 자리만 잡아 둔다.
+             settings.orderFormUrl에 링크를 넣으면 그대로 활성화된다. */
+          <span class="btn dim" aria-disabled="true">Order</span>
         )
       }
       <p class="meta" style="margin-top:8px">
