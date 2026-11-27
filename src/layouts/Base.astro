@@ -56,17 +56,21 @@ const copyright =
 
     <main class="site">
       <header class="site-identity">
+        <!-- 홈에서만 h1, 나머지는 p. 두 태그의 상자 치수를 같게 맞춰
+             어느 페이지에서나 워드마크와 메뉴가 같은 자리에 선다 -->
         {
           isHome ? (
-            <h1>
+            <h1 class="site-title">
               <a class="site-name" href="/">
                 {SITE_NAME}
               </a>
             </h1>
           ) : (
-            <a class="site-name" href="/">
-              {SITE_NAME}
-            </a>
+            <p class="site-title">
+              <a class="site-name" href="/">
+                {SITE_NAME}
+              </a>
+            </p>
           )
         }
       </header>
@@ -103,6 +107,9 @@ const copyright =
         padding: var(--gutter);
         min-height: 100vh;
         align-items: start;
+        /* 메뉴를 펼쳤을 때 브라우저가 스크롤을 보정하면서
+           화면이 위로 미끄러지는 것을 막는다 */
+        overflow-anchor: none;
       }
 
       .site-identity {
@@ -125,6 +132,15 @@ const copyright =
         display: flex;
         flex-direction: column;
         gap: 1px;
+      }
+
+      /* h1과 p의 치수를 똑같이 고정한다 */
+      .site-title {
+        margin: 0;
+        max-width: none;
+        font-size: var(--text-size);
+        font-weight: 400;
+        line-height: var(--line-height);
       }
 
       .site-name {

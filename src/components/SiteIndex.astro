@@ -16,6 +16,7 @@ const artists = (await getCollection('artists')).sort(
 );
 
 const path = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const isArtistSection = path === '/artist' || path.startsWith('/artist/');
 const isContact = path === '/contact';
 
 const shopUrl = settings.shopUrl || '/';
@@ -28,7 +29,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
 <nav class="index" aria-label="섹션">
   <ol class="index-sections">
     <li class="index-section">
-      <details class="artist-disclosure">
+      <details class="artist-disclosure" open={isArtistSection}>
         <summary class="index-link">
           <span class="index-name">Artist</span>
         </summary>
@@ -117,26 +118,15 @@ const pad = (n: number) => String(n).padStart(2, '0');
   }
 
   @media (max-width: 720px) {
-    /* 펼친 목록이 아래로 겹쳐 내려오게 해서 Shop·Contact와 본문이
-       밀려나지 않도록 한다 */
-    .artist-disclosure {
-      position: relative;
-    }
-
     /* 아티스트 목록을 한 줄로 흘려 메뉴 높이를 줄인다.
-       번호는 숨기고 이름만 남긴다 */
+       번호는 숨기고 이름만 남긴다.
+       펼치면 Shop·Contact가 아래로 밀리고, 가려지지는 않는다 */
     .artist-list {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      z-index: 2;
       display: flex;
       flex-wrap: wrap;
       column-gap: 1.1em;
       row-gap: 2px;
-      padding: 2px 0 var(--row-padding) 1.2em;
-      background: var(--paper);
+      padding: 2px 0 0 1.2em;
     }
 
     .artist-number {
