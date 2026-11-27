@@ -30,8 +30,8 @@
   /* 색 — 글자는 검정 하나 */
   --ink: #000000;
   --paper: #ffffff;
-  --rule: rgba(0, 0, 0, 0.18);
-  --rule-faint: rgba(0, 0, 0, 0.1);
+  /* 괘선은 하나뿐이다. 굵기 1px, 명도 0.1 */
+  --rule: rgba(0, 0, 0, 0.1);
   --placeholder: #ebebeb; /* 이미지가 비었을 때의 회색 바탕 */
 
   /* 치수 */
@@ -165,9 +165,12 @@ img {
    기록 표 — Home과 Artist 색인이 공유하는 단 하나의 목록 조판
    ----------------------------------------------------------- */
 
+/* 열 너비를 내용이 아니라 지정값으로 고정한다. 표를 옮겨 다녀도
+   같은 자리에서 같은 폭으로 읽히게 하기 위해서다. */
 .record-table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 .record-table th {
@@ -183,8 +186,20 @@ img {
 
 .record-table td {
   padding: var(--row-padding) 1.2em var(--row-padding) 0;
-  border-bottom: 1px solid var(--rule-faint);
+  border-bottom: 1px solid var(--rule);
   vertical-align: baseline;
+  /* 한 줄로 두고 넘치면 말줄임표. 누르면 펼쳐진다 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: default;
+}
+
+/* 펼친 셀은 줄바꿈을 허용한다 */
+.record-table td.is-expanded {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
 }
 
 .record-table th:last-child,
@@ -206,26 +221,12 @@ img {
   cursor: pointer;
 }
 
-.sort-button:hover {
-  text-decoration: underline;
-  text-underline-offset: 0.22em;
-  text-decoration-thickness: 0.5px;
-}
-
 .sort-button[data-direction='asc']::after {
   content: ' ↑';
 }
 
 .sort-button[data-direction='desc']::after {
   content: ' ↓';
-}
-
-.col-number {
-  width: 3.4em;
-}
-
-.col-nowrap {
-  white-space: nowrap;
 }
 
 /* -----------------------------------------------------------
@@ -287,6 +288,9 @@ img {
   align-items: baseline;
   justify-content: space-between;
   gap: 1.2em;
+  position: sticky;
+  top: 0;
+  z-index: 10;
   width: 100%;
   margin: 0;
   padding: 2px var(--gutter) 3px;
@@ -309,6 +313,8 @@ img {
 
 .site-notice-close {
   flex: 0 0 auto;
+  font-size: 9px;
+  letter-spacing: 0.08em;
   appearance: none;
   margin: 0;
   padding: 0;
@@ -354,5 +360,11 @@ figcaption {
 @media (max-width: 720px) {
   :root {
     --gutter: 14px;
+  }
+
+  /* 우측 끝 열(분류)은 오른쪽에 붙인다 */
+  .record-table th:last-child,
+  .record-table td:last-child {
+    text-align: right;
   }
 }

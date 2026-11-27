@@ -38,17 +38,19 @@ const activityRows: Row[] = [...works]
     },
   }));
 
+/* 열 너비는 내용과 무관하게 고정한다. 아티스트 상세의 Works 표와
+   같은 비율을 써서 두 표가 같은 격자로 읽히게 한다. */
 const activityColumns: Column[] = [
-  { key: 'year', label: 'Year', isNumber: true, sortable: true },
-  { key: 'title', label: 'Item', sortable: true },
-  { key: 'artist', label: 'Artist' },
-  { key: 'type', label: 'Type', isClassifier: true, noWrap: true, sortable: true },
+  { key: 'year', label: 'Year', isNumber: true, sortable: true, width: '12%' },
+  { key: 'title', label: 'Item', sortable: true, width: '38%' },
+  { key: 'artist', label: 'Artist', width: '32%' },
+  { key: 'type', label: 'Type', isClassifier: true, sortable: true, width: '18%' },
 ];
 
 const artistColumns: Column[] = [
-  { key: 'no', label: 'No', isNumber: true },
-  { key: 'name', label: 'Artist' },
-  { key: 'roles', label: 'Role' },
+  { key: 'no', label: 'No', isNumber: true, width: '12%' },
+  { key: 'name', label: 'Artist', width: '38%' },
+  { key: 'roles', label: 'Role', width: '50%' },
 ];
 
 const artistRows: Row[] = artists.map((artist) => ({

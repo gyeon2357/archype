@@ -118,6 +118,10 @@ const pad = (n: number) => String(n).padStart(2, '0');
   }
 
   @media (max-width: 720px) {
+    .index {
+      gap: var(--row-padding);
+    }
+
     /* 아티스트 목록을 한 줄로 흘려 메뉴 높이를 줄인다.
        번호는 숨기고 이름만 남긴다.
        펼치면 Shop·Contact가 아래로 밀리고, 가려지지는 않는다 */
@@ -134,12 +138,12 @@ const pad = (n: number) => String(n).padStart(2, '0');
     }
 
     .index-link {
-      min-height: var(--tap-size);
+      min-height: 22px;
       align-items: center;
     }
 
     .artist-entry .index-link {
-      min-height: calc(var(--tap-size) - 8px);
+      min-height: 18px;
     }
   }
 </style>

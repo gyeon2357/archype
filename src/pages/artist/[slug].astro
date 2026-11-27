@@ -30,11 +30,12 @@ const works = (await getCollection('works'))
   )
   .sort((a, b) => (b.data.year ?? '').localeCompare(a.data.year ?? ''));
 
+/* Home의 Recent 표와 같은 비율을 쓴다 */
 const workColumns: Column[] = [
-  { key: 'year', label: 'Year', isNumber: true, sortable: true },
-  { key: 'title', label: 'Work', sortable: true },
-  { key: 'with', label: 'With' },
-  { key: 'type', label: 'Type', isClassifier: true, noWrap: true, sortable: true },
+  { key: 'year', label: 'Year', isNumber: true, sortable: true, width: '12%' },
+  { key: 'title', label: 'Work', sortable: true, width: '38%' },
+  { key: 'with', label: 'With', width: '32%' },
+  { key: 'type', label: 'Type', isClassifier: true, sortable: true, width: '18%' },
 ];
 
 const workRows: Row[] = works.map((work) => ({
@@ -107,7 +108,7 @@ const workRows: Row[] = works.map((work) => ({
 
   {
     workRows.length > 0 && (
-      <section class="content-block">
+      <section class="content-block artist-works">
         <h2 class="section-label">Works</h2>
         <RecordTable columns={workColumns} rows={workRows} linkKey="title" />
       </section>
@@ -126,6 +127,11 @@ const workRows: Row[] = works.map((work) => ({
 
   .artist-profile {
     width: 150px;
+  }
+
+  /* 마지막 블록이라 여백이 지워지는데, 페이지 머리와 같은 값으로 되살린다 */
+  .artist-works {
+    margin-bottom: calc(var(--gutter) * 2);
   }
 
   @media (max-width: 720px) {

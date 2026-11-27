@@ -1,12 +1,10 @@
 ---
 import { getEntry, render } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import settings from '../../content/settings/settings.json';
 
 const contact = await getEntry('contact', 'index');
 const { Content } = contact ? await render(contact) : { Content: null };
 const hasBody = Boolean(contact?.body?.trim());
-const socials = settings.socials ?? [];
 ---
 
 <Base title="Contact">
@@ -22,32 +20,4 @@ const socials = settings.socials ?? [];
     )
   }
 
-  {
-    (settings.contactEmail || socials.length > 0) && (
-      <section class="content-block">
-        <ul class="contact-links">
-          {settings.contactEmail && (
-            <li>
-              <a href={`mailto:${settings.contactEmail}`}>{settings.contactEmail}</a>
-            </li>
-          )}
-          {socials.map((social) => (
-            <li>
-              <a href={social.url} target="_blank" rel="noopener noreferrer">
-                {social.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </section>
-    )
-  }
 </Base>
-
-<style>
-  .contact-links {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-  }
-</style>

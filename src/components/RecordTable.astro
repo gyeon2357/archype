@@ -11,10 +11,10 @@ export interface Column {
   key: string;
   /** 표 머리에 쓸 라틴 라벨 */
   label: string;
-  /** 번호 열처럼 좁게 고정할 때 */
+  /** 번호 열처럼 작은 라틴 글자로 둘 때 */
   isNumber?: boolean;
-  /** 줄바꿈을 막을 때 */
-  noWrap?: boolean;
+  /** 열 너비. table-layout: fixed 라서 이 값이 그대로 적용된다 */
+  width?: string;
   /** 분류·장르처럼 성격을 표시하는 열 */
   isClassifier?: boolean;
   /** 열 머리를 눌러 정렬할 수 있게 할 때 */
@@ -49,16 +49,9 @@ const anchorKey = linkKey ?? columns[1]?.key ?? columns[0]?.key;
 
 function cellClass(column: Column) {
   const names: string[] = [];
-  if (column.isNumber) names.push('col-number', 'item-number');
-  if (column.noWrap) names.push('col-nowrap');
+  if (column.isNumber) names.push('item-number');
   if (column.isClassifier) names.push('classifier');
   return names.join(' ') || undefined;
-}
-
-function headClass(column: Column) {
-  if (column.isNumber) return 'col-number';
-  if (column.noWrap) return 'col-nowrap';
-  return undefined;
 }
 
 function cellText(value: CellValue) {
@@ -75,7 +68,7 @@ function cellHref(row: Row, column: Column) {
     <tr>
       {
         columns.map((column, index) => (
-          <th class={headClass(column)} scope="col">
+          <th scope="col" style={column.width ? `width: ${column.width}` : undefined}>
             {column.sortable ? (
               <button type="button" class="sort-button" data-column={index}>
                 {column.label}
@@ -156,6 +149,21 @@ function cellHref(row: Row, column: Column) {
         });
         rows.forEach((row) => body.appendChild(row));
       });
+    });
+
+    // 말줄임표로 잘린 셀을 누르면 전체 내용을 펼친다.
+    // 링크를 눌렀을 때는 펼치지 않고 그대로 이동한다.
+    body.addEventListener('click', (event) => {
+      const target = event.target as HTMLElement | null;
+      if (!target || target.closest('a')) return;
+
+      const cell = target.closest('td');
+      if (!cell) return;
+
+      const truncated = cell.scrollWidth > cell.clientWidth;
+      if (truncated || cell.classList.contains('is-expanded')) {
+        cell.classList.toggle('is-expanded');
+      }
     });
   });
 </script>

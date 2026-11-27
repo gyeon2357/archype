@@ -11,12 +11,12 @@ const artists = (await getCollection('artists')).sort(
 );
 
 const columns: Column[] = [
-  { key: 'no', label: 'No', isNumber: true },
-  { key: 'name', label: 'Artist' },
-  { key: 'roles', label: 'Role' },
-  { key: 'genres', label: 'Genre', isClassifier: true },
-  { key: 'since', label: 'Since', noWrap: true },
-  { key: 'base', label: 'Base', noWrap: true },
+  { key: 'no', label: 'No', isNumber: true, width: '8%' },
+  { key: 'name', label: 'Artist', width: '22%' },
+  { key: 'roles', label: 'Role', width: '20%' },
+  { key: 'genres', label: 'Genre', isClassifier: true, width: '20%' },
+  { key: 'since', label: 'Since', width: '15%' },
+  { key: 'base', label: 'Base', width: '15%' },
 ];
 
 const rows: Row[] = artists.map((artist) => ({
