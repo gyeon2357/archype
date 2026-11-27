@@ -1,12 +1,16 @@
 {
   "siteName": "ARCHYPE",
   "description": "아크하입 웹사이트",
+  "shopUrl": "/",
   "contactEmail": "",
-  "orderFormUrl": "",
   "socials": [
     {
       "label": "Instagram",
       "url": "https://instagram.com/"
+    },
+    {
+      "label": "Linktree",
+      "url": "https://linktr.ee/"
     }
   ]
 }
