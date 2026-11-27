@@ -9,7 +9,7 @@ since: 2024-
 base: Seoul
 links:
   - label: 아크하입
-    url: 'https://archype.jkp-112357.workers.dev'
+    url: 'https://www.instagram.com/arc.hype/'
 profileCaption: ''
 ---
 
