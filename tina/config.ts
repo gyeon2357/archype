@@ -89,21 +89,6 @@ export default defineConfig({
             type: 'string',
           },
           {
-            name: 'moodImages',
-            label: '무드 이미지',
-            type: 'object',
-            list: true,
-            description:
-              '여러 장을 넣을 수 있습니다. 항목 오른쪽 메뉴에서 순서를 바꾸거나 삭제하세요.',
-            ui: {
-              itemProps: (item) => ({ label: item?.caption || '이미지' }),
-            },
-            fields: [
-              { name: 'src', label: '파일', type: 'image' },
-              { name: 'caption', label: '캡션', type: 'string' },
-            ],
-          },
-          {
             name: 'body',
             label: '소개',
             type: 'rich-text',

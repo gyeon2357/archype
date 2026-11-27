@@ -32,85 +32,60 @@ const workRows: Row[] = [...data.works]
 ---
 
 <Base title={data.name}>
-  <article class="artist">
-    <!-- 이름도 본문과 같은 크기로 둔다. 위계는 위치와 여백이 만든다 -->
-    <header class="content-block">
-      <h1>{data.name}</h1>
-    </header>
+  <!-- 이름도 본문과 같은 크기로 둔다. 위계는 위치와 여백이 만든다 -->
+  <header class="content-block">
+    <h1>{data.name}</h1>
+  </header>
 
-    <div class="artist-head">
-      <div class="artist-facts">
-        <FactList
-          facts={[
-            { label: 'No', value: String(data.no).padStart(2, '0') },
-            { label: 'Role', value: data.roles.join(', ') },
-            { label: 'Genre', value: data.genres.join(', ') },
-            { label: 'Since', value: data.since },
-            { label: 'Base', value: data.base },
-            ...data.links.map((link) => ({
-              label: link.label,
-              value: link.url.replace(/^https?:\/\//, ''),
-              url: link.url,
-            })),
-          ]}
-        />
-      </div>
-
-      <!-- 인물 사진 자리 -->
-      <figure class="artist-profile">
-        {
-          data.profileImage ? (
-            <img
-              src={data.profileImage}
-              alt={data.profileCaption ?? data.name}
-              loading="lazy"
-            />
-          ) : (
-            <div class="image-placeholder">
-              <span class="section-label">Profile</span>
-            </div>
-          )
-        }
-        {data.profileCaption && <figcaption>{data.profileCaption}</figcaption>}
-      </figure>
+  <div class="artist-head">
+    <div class="artist-facts">
+      <FactList
+        facts={[
+          { label: 'No', value: String(data.no).padStart(2, '0') },
+          { label: 'Role', value: data.roles.join(', ') },
+          { label: 'Genre', value: data.genres.join(', ') },
+          { label: 'Since', value: data.since },
+          { label: 'Base', value: data.base },
+          ...data.links.map((link) => ({
+            label: link.label,
+            value: link.url.replace(/^https?:\/\//, ''),
+            url: link.url,
+          })),
+        ]}
+      />
     </div>
 
-    <section class="content-block body-text">
-      <Content />
-    </section>
-
-    {
-      workRows.length > 0 && (
-        <section class="content-block">
-          <h2 class="section-label">Works</h2>
-          <RecordTable columns={workColumns} rows={workRows} linkKey="title" />
-        </section>
-      )
-    }
-
-    <!-- 무드 이미지 자리 -->
-    <section class="content-block">
-      <h2 class="section-label">Mood</h2>
+    <!-- 인물 사진 자리 -->
+    <figure class="artist-profile">
       {
-        data.moodImages.length > 0 ? (
-          <div class="image-grid">
-            {data.moodImages.map((image) => (
-              <figure>
-                <img src={image.src} alt={image.caption ?? data.name} loading="lazy" />
-                {image.caption && <figcaption>{image.caption}</figcaption>}
-              </figure>
-            ))}
-          </div>
+        data.profileImage ? (
+          <img
+            src={data.profileImage}
+            alt={data.profileCaption ?? data.name}
+            loading="lazy"
+          />
         ) : (
-          <div class="image-grid">
-            <div class="image-placeholder image-placeholder--wide">
-              <span class="section-label">Mood</span>
-            </div>
+          <div class="image-placeholder">
+            <span class="section-label">Profile</span>
           </div>
         )
       }
-    </section>
-  </article>
+      {data.profileCaption && <figcaption>{data.profileCaption}</figcaption>}
+    </figure>
+  </div>
+
+  <section class="content-block body-text">
+    <Content />
+  </section>
+
+  {
+    workRows.length > 0 && (
+      <section class="content-block">
+        <h2 class="section-label">Works</h2>
+        <RecordTable columns={workColumns} rows={workRows} linkKey="title" />
+      </section>
+    )
+  }
 </Base>
 
 <style>

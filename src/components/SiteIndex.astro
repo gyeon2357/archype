@@ -2,9 +2,10 @@
 /**
  * 책의 목차에 해당하는 인덱스 메뉴.
  *
- * Artist는 기본적으로 접혀 있고, 아티스트 페이지에 들어가 있을 때만 펼쳐진다.
+ * 대메뉴에는 번호를 붙이지 않고 아티스트 목록에만 번호를 남긴다.
+ * Artist는 기본적으로 접혀 있고 아티스트 페이지에 들어가 있을 때만 펼쳐진다.
  * 접고 펴는 데 details/summary를 써서 자바스크립트 없이 동작한다.
- * 모바일에서는 아티스트 목록을 한 줄로 흘려 메뉴가 차지하는 높이를 줄인다.
+ * 모바일에서는 아티스트 목록을 한 줄로 흘려 메뉴 높이를 줄인다.
  */
 import { getCollection } from 'astro:content';
 import settings from '../../content/settings/settings.json';
@@ -28,7 +29,6 @@ const pad = (n: number) => String(n).padStart(2, '0');
     <li class="index-section">
       <details class="artist-disclosure" open={isArtistSection}>
         <summary class="index-link">
-          <span class="item-number">01</span>
           <span class="index-name">Artist</span>
         </summary>
 
@@ -37,7 +37,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
             artists.map((artist) => (
               <li class="artist-entry">
                 <a
-                  class="index-link index-link--nested"
+                  class="index-link"
                   href={`/artist/${artist.id}`}
                   aria-current={path === `/artist/${artist.id}` ? 'page' : undefined}
                 >
@@ -58,7 +58,6 @@ const pad = (n: number) => String(n).padStart(2, '0');
         target={shopIsExternal ? '_blank' : undefined}
         rel={shopIsExternal ? 'noopener noreferrer' : undefined}
       >
-        <span class="item-number">02</span>
         <span class="index-name">Shop</span>
       </a>
     </li>
@@ -69,36 +68,19 @@ const pad = (n: number) => String(n).padStart(2, '0');
         href="/contact"
         aria-current={isContact ? 'page' : undefined}
       >
-        <span class="item-number">03</span>
         <span class="index-name">Contact</span>
       </a>
     </li>
   </ol>
-
-  <footer class="index-links">
-    {
-      settings.socials?.map((social) => (
-        <a href={social.url} target="_blank" rel="noopener noreferrer">
-          {social.label}
-        </a>
-      ))
-    }
-    <small class="index-copyright">© {new Date().getFullYear()} {settings.siteName}</small>
-  </footer>
 </nav>
 
 <style>
-  .index {
-    display: flex;
-    flex-direction: column;
-    gap: calc(var(--gutter) * 1.2);
-  }
-
   .index-link {
     display: flex;
     gap: 0.7em;
     align-items: baseline;
-    padding: 1px 0;
+    padding: 0;
+    line-height: 1.35;
     cursor: pointer;
   }
 
@@ -130,29 +112,10 @@ const pad = (n: number) => String(n).padStart(2, '0');
   }
 
   .artist-list {
-    margin-top: 1px;
-    padding-left: 1.9em;
-  }
-
-  .artist-entry {
-    padding: 0;
-  }
-
-  .index-links {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-  }
-
-  .index-copyright {
-    font-size: inherit;
+    padding-left: 1.2em;
   }
 
   @media (max-width: 720px) {
-    .index {
-      gap: var(--gutter);
-    }
-
     /* 아티스트 목록을 한 줄로 흘려 메뉴 높이를 줄인다.
        번호는 숨기고 이름만 남긴다 */
     .artist-list {
@@ -160,7 +123,6 @@ const pad = (n: number) => String(n).padStart(2, '0');
       flex-wrap: wrap;
       column-gap: 1.1em;
       row-gap: 2px;
-      padding-left: 1.9em;
     }
 
     .artist-number {
@@ -173,13 +135,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
     }
 
     .artist-entry .index-link {
-      min-height: calc(var(--tap-size) - 6px);
-    }
-
-    .index-links {
-      flex-direction: row;
-      flex-wrap: wrap;
-      column-gap: 1.1em;
+      min-height: calc(var(--tap-size) - 8px);
     }
   }
 </style>

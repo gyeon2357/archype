@@ -249,12 +249,6 @@ img {
   max-width: 44em;
 }
 
-.image-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-  gap: var(--gutter);
-}
-
 figure {
   margin: 0;
 }

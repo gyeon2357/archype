@@ -6,11 +6,6 @@ const link = z.object({
   url: z.string(),
 });
 
-const captionedImage = z.object({
-  src: z.string(),
-  caption: z.string().optional(),
-});
-
 const artists = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './content/artists' }),
   schema: z.object({
@@ -34,8 +29,6 @@ const artists = defineCollection({
     /** 인물 사진 한 장 */
     profileImage: z.string().optional(),
     profileCaption: z.string().optional(),
-    /** 분위기를 보여주는 이미지들 */
-    moodImages: z.array(captionedImage).default([]),
   }),
 });
 

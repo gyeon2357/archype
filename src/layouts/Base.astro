@@ -2,11 +2,12 @@
 /**
  * 사이트 뼈대.
  *
- * 데스크톱은 2열 2행 격자다.
+ * 데스크톱은 2열 3행 격자다.
  *   1행: 사이트 이름(ARCHYPE)  |  (비움)
  *   2행: 인덱스 메뉴           |  페이지 내용
- * 본문의 첫 줄이 메뉴 첫 항목과 같은 행에서 시작하므로
- * 둘의 윗선이 자동으로 맞는다.
+ *   3행: 푸터                  |  (비움)
+ * 본문의 첫 줄이 메뉴 첫 항목과 같은 행에서 시작하므로 둘의 윗선이 맞고,
+ * 푸터는 화면 좌측 최하단에 붙는다.
  */
 import SiteIndex from '../components/SiteIndex.astro';
 import settings from '../../content/settings/settings.json';
@@ -20,6 +21,7 @@ interface Props {
 const { title, description } = Astro.props;
 const fullTitle = title ? `${title} — ${settings.siteName}` : settings.siteName;
 const isHome = (Astro.url.pathname.replace(/\/+$/, '') || '/') === '/';
+const socials = settings.socials ?? [];
 ---
 
 <!doctype html>
@@ -44,11 +46,15 @@ const isHome = (Astro.url.pathname.replace(/\/+$/, '') || '/') === '/';
   </head>
 
   <body>
-    <div class="site">
+    <main class="site">
       <header class="site-identity">
         {
           isHome ? (
-            <h1 class="site-name">{settings.siteName}</h1>
+            <h1>
+              <a class="site-name" href="/">
+                {settings.siteName}
+              </a>
+            </h1>
           ) : (
             <a class="site-name" href="/">
               {settings.siteName}
@@ -61,10 +67,23 @@ const isHome = (Astro.url.pathname.replace(/\/+$/, '') || '/') === '/';
         <SiteIndex />
       </aside>
 
-      <main class="site-content">
+      <article class="site-content">
         <slot />
-      </main>
-    </div>
+      </article>
+
+      <footer class="site-footer">
+        {
+          socials.map((social) => (
+            <a href={social.url} target="_blank" rel="noopener noreferrer">
+              {social.label}
+            </a>
+          ))
+        }
+        <small class="site-copyright">
+          © {new Date().getFullYear()} {settings.siteName}
+        </small>
+      </footer>
+    </main>
 
     <nav class="index-shortcut" aria-label="인덱스로 이동">
       <a class="section-label" href="#index">Index</a>
@@ -74,27 +93,34 @@ const isHome = (Astro.url.pathname.replace(/\/+$/, '') || '/') === '/';
       .site {
         display: grid;
         grid-template-columns: var(--index-width) minmax(0, 1fr);
+        grid-template-rows: auto 1fr auto;
         column-gap: calc(var(--gutter) * 2.5);
         row-gap: var(--identity-gap);
         padding: var(--gutter);
+        min-height: 100vh;
         align-items: start;
       }
 
       .site-identity {
-        grid-column: 1;
-        grid-row: 1;
+        grid-area: 1 / 1;
       }
 
       .site-index {
-        grid-column: 1;
-        grid-row: 2;
+        grid-area: 2 / 1;
       }
 
       .site-content {
-        grid-column: 2;
-        grid-row: 2;
+        grid-area: 2 / 2;
         min-width: 0;
         padding-bottom: calc(var(--gutter) * 4);
+      }
+
+      .site-footer {
+        grid-area: 3 / 1;
+        align-self: end;
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
       }
 
       .site-name {
@@ -103,29 +129,43 @@ const isHome = (Astro.url.pathname.replace(/\/+$/, '') || '/') === '/';
         letter-spacing: 0.06em;
       }
 
+      .site-copyright {
+        font-size: inherit;
+      }
+
       .index-shortcut {
         display: none;
       }
 
       /* 모바일은 접지 않고 인덱스를 문서 맨 위로 흘려보낸다.
-         햄버거 아이콘 대신 하단 한 줄에서 인덱스로 되돌아간다 */
+         푸터는 페이지 맨 아래에 놓이고, 인덱스로 돌아가는 한 줄은
+         화면 우측 하단에 고정된다 */
       @media (max-width: 720px) {
         .site {
           grid-template-columns: minmax(0, 1fr);
+          grid-template-rows: none;
           row-gap: var(--gutter);
           padding-bottom: calc(var(--tap-size) + var(--gutter) * 2);
         }
 
         .site-identity,
         .site-index,
-        .site-content {
-          grid-column: 1;
-          grid-row: auto;
+        .site-content,
+        .site-footer {
+          grid-area: auto;
         }
 
         .site-index {
           padding-bottom: var(--gutter);
           border-bottom: 1px solid var(--rule);
+        }
+
+        .site-footer {
+          flex-direction: row;
+          flex-wrap: wrap;
+          column-gap: 1.1em;
+          padding-top: var(--gutter);
+          border-top: 1px solid var(--rule);
         }
 
         .index-shortcut {

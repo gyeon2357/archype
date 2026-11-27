@@ -13,7 +13,6 @@ works:
     url: ''
 profileImage: ''
 profileCaption: ''
-moodImages: []
 ---
 
 (소개 문구를 Tina에서 입력하세요. 표의 생김새를 보여주기 위해 작업 항목 하나만 자리표시자로 넣어 두었습니다.)
