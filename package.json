@@ -5,8 +5,9 @@
   "private": true,
   "scripts": {
     "dev": "tinacms dev -c \"astro dev\"",
-    "build": "tinacms build && astro build",
+    "build": "node scripts/build.mjs",
     "build:site": "astro build",
+    "build:all": "tinacms build && astro build",
     "preview": "astro preview"
   },
   "dependencies": {
