@@ -3,9 +3,10 @@
  * 책의 목차에 해당하는 인덱스 메뉴.
  *
  * 대메뉴에는 번호를 붙이지 않고 아티스트 목록에만 번호를 남긴다.
- * Artist는 기본적으로 접혀 있고 아티스트 페이지에 들어가 있을 때만 펼쳐진다.
+ * Artist는 어느 페이지에서든 항상 접힌 상태로 시작한다. 페이지마다
+ * 펼침 상태가 달라지면 메뉴의 높이가 바뀌어 항목들이 움직이기 때문이다.
  * 접고 펴는 데 details/summary를 써서 자바스크립트 없이 동작한다.
- * 모바일에서는 아티스트 목록을 한 줄로 흘려 메뉴 높이를 줄인다.
+ * 모바일에서는 펼친 목록이 아래로 겹쳐 내려와 다른 항목을 밀지 않는다.
  */
 import { getCollection } from 'astro:content';
 import settings from '../../content/settings/settings.json';
@@ -15,7 +16,6 @@ const artists = (await getCollection('artists')).sort(
 );
 
 const path = Astro.url.pathname.replace(/\/+$/, '') || '/';
-const isArtistSection = path === '/artist' || path.startsWith('/artist/');
 const isContact = path === '/contact';
 
 const shopUrl = settings.shopUrl || '/';
@@ -27,7 +27,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
 <nav class="index" aria-label="섹션">
   <ol class="index-sections">
     <li class="index-section">
-      <details class="artist-disclosure" open={isArtistSection}>
+      <details class="artist-disclosure">
         <summary class="index-link">
           <span class="index-name">Artist</span>
         </summary>
@@ -116,13 +116,26 @@ const pad = (n: number) => String(n).padStart(2, '0');
   }
 
   @media (max-width: 720px) {
+    /* 펼친 목록이 아래로 겹쳐 내려오게 해서 Shop·Contact와 본문이
+       밀려나지 않도록 한다 */
+    .artist-disclosure {
+      position: relative;
+    }
+
     /* 아티스트 목록을 한 줄로 흘려 메뉴 높이를 줄인다.
        번호는 숨기고 이름만 남긴다 */
     .artist-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      z-index: 2;
       display: flex;
       flex-wrap: wrap;
       column-gap: 1.1em;
       row-gap: 2px;
+      padding: 2px 0 var(--row-padding) 1.2em;
+      background: var(--paper);
     }
 
     .artist-number {

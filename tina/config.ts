@@ -30,9 +30,6 @@ export default defineConfig({
         label: 'Artist',
         path: 'content/artists',
         format: 'md',
-        ui: {
-          router: ({ document }) => `/artist/${document._sys.filename}`,
-        },
         fields: [
           {
             name: 'name',
@@ -98,7 +95,6 @@ export default defineConfig({
         ui: {
           global: true,
           allowedActions: { create: false, delete: false },
-          router: () => '/',
         },
         fields: [
           {
@@ -127,7 +123,6 @@ export default defineConfig({
         ui: {
           global: true,
           allowedActions: { create: false, delete: false },
-          router: () => '/contact',
         },
         fields: [
           { name: 'body', label: '본문', type: 'rich-text', isBody: true },
