@@ -32,6 +32,7 @@
   --paper: #ffffff;
   --rule: rgba(0, 0, 0, 0.18);
   --rule-faint: rgba(0, 0, 0, 0.1);
+  --placeholder: #ebebeb; /* 이미지가 비었을 때의 회색 바탕 */
 
   /* 치수 */
   --index-width: 200px;
@@ -262,13 +263,13 @@ figcaption {
   margin-top: 5px;
 }
 
-/* 이미지가 아직 없을 때 자리를 보여주는 틀.
+/* 이미지가 아직 없을 때 자리를 보여주는 회색 바탕.
    Tina에서 이미지를 넣으면 자동으로 사라진다 */
 .image-placeholder {
   display: flex;
   align-items: flex-end;
   padding: var(--row-padding);
-  border: 1px dashed var(--rule);
+  background: var(--placeholder);
   aspect-ratio: 4 / 5;
 }
 
