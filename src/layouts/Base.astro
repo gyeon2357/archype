@@ -1,0 +1,120 @@
+---
+import Sidebar from '../components/Sidebar.astro';
+import settings from '../../content/settings/settings.json';
+import '../styles/type.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+const fullTitle = title ? `${title} — ${settings.siteName}` : settings.siteName;
+
+const path = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const section = path.startsWith('/artist')
+  ? 'Artist'
+  : path.startsWith('/shop')
+    ? 'Shop'
+    : path === '/contact'
+      ? 'Contact'
+      : 'Home';
+---
+
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description ?? settings.description ?? ''} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:type" content="website" />
+  </head>
+
+  <body>
+    <div class="shell">
+      <aside class="rail">
+        <Sidebar />
+      </aside>
+
+      <main class="main" id="main">
+        <slot />
+      </main>
+    </div>
+
+    <nav class="bottombar" aria-label="모바일 인덱스">
+      <span class="label">{section}</span>
+      <a class="label" href="#index">Index</a>
+    </nav>
+
+    <style>
+      .shell {
+        display: grid;
+        grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+        gap: calc(var(--pad) * 2.5);
+        padding: var(--pad);
+        align-items: start;
+      }
+
+      .rail {
+        position: sticky;
+        top: var(--pad);
+        max-height: calc(100vh - var(--pad) * 2);
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .main {
+        min-width: 0;
+        padding-bottom: calc(var(--pad) * 4);
+      }
+
+      .bottombar {
+        display: none;
+      }
+
+      /* 모바일: 사이드바를 접지 않고 문서 맨 위 인덱스로 흘려보낸다.
+         햄버거 아이콘 대신 하단 한 줄 바에서 인덱스로 되돌아간다. */
+      @media (max-width: 720px) {
+        .shell {
+          grid-template-columns: minmax(0, 1fr);
+          gap: calc(var(--pad) * 1.8);
+          padding-bottom: calc(var(--tap) + var(--pad) * 2);
+        }
+
+        .rail {
+          position: static;
+          max-height: none;
+          overflow: visible;
+          padding-bottom: var(--pad);
+          border-bottom: 1px solid var(--rule);
+        }
+
+        .bottombar {
+          position: fixed;
+          inset: auto 0 0 0;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 1em;
+          height: var(--tap);
+          padding: 0 var(--pad);
+          background: var(--paper);
+          border-top: 1px solid var(--rule);
+        }
+      }
+
+      @media (min-width: 721px) and (max-width: 980px) {
+        :root {
+          --sidebar-w: 170px;
+        }
+
+        .shell {
+          gap: calc(var(--pad) * 1.6);
+        }
+      }
+    </style>
+  </body>
+</html>

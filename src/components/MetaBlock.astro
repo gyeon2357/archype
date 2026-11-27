@@ -1,0 +1,62 @@
+---
+/**
+ * 명도만 낮춘 메타데이터 덩어리.
+ * 크기를 건드리지 않고 본문과 구분하는 장치다.
+ */
+interface Item {
+  label: string;
+  value?: string | null;
+  url?: string;
+}
+
+interface Props {
+  items: Item[];
+}
+
+const { items } = Astro.props;
+const visible = items.filter((item) => item.value);
+---
+
+{
+  visible.length > 0 && (
+    <dl class="metablock">
+      {visible.map((item) => (
+        <div class="row">
+          <dt class="label">{item.label}</dt>
+          <dd class="meta">
+            {item.url ? <a href={item.url}>{item.value}</a> : item.value}
+          </dd>
+        </div>
+      ))}
+    </dl>
+  )
+}
+
+<style>
+  .metablock {
+    margin: 0 0 calc(var(--pad) * 1.6);
+    display: grid;
+    gap: 2px;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 7em 1fr;
+    gap: 1em;
+    align-items: baseline;
+  }
+
+  dt {
+    margin: 0;
+  }
+
+  dd {
+    margin: 0;
+  }
+
+  @media (max-width: 720px) {
+    .row {
+      grid-template-columns: 6em 1fr;
+    }
+  }
+</style>

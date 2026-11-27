@@ -1,0 +1,83 @@
+---
+/**
+ * 사이트의 단 하나의 목록 조판.
+ * Home · Artist · Shop이 모두 이 컴포넌트를 쓴다.
+ * 페이지를 옮겨도 같은 문서를 넘기는 감각을 유지하는 장치다.
+ */
+export interface Column {
+  key: string;
+  label: string;
+  /** 번호 열처럼 좁게 고정할 때 */
+  no?: boolean;
+  /** 줄바꿈을 막을 때 */
+  nowrap?: boolean;
+  /** 명도를 낮춰 메타데이터로 보이게 할 때 */
+  dim?: boolean;
+  /** 이탤릭으로 분류를 표시할 때 */
+  ital?: boolean;
+}
+
+export interface Row {
+  href?: string;
+  cells: Record<string, string | number | null | undefined>;
+  /** 품절·아카이브처럼 지난 항목 */
+  muted?: boolean;
+}
+
+interface Props {
+  columns: Column[];
+  rows: Row[];
+  /** 링크를 걸 열의 key. 기본값은 두 번째 열 */
+  linkKey?: string;
+}
+
+const { columns, rows, linkKey } = Astro.props;
+const anchorKey = linkKey ?? columns[1]?.key ?? columns[0]?.key;
+
+function cellClass(col: Column, muted?: boolean) {
+  const cls: string[] = [];
+  if (col.no) cls.push('c-no', 'num');
+  if (col.nowrap) cls.push('c-nowrap');
+  if (col.dim) cls.push('meta');
+  if (col.ital) cls.push('ital');
+  if (muted) cls.push('dim');
+  return cls.join(' ') || undefined;
+}
+
+function text(value: string | number | null | undefined) {
+  return value === null || value === undefined || value === '' ? '—' : String(value);
+}
+---
+
+<table class="index">
+  <thead>
+    <tr>
+      {
+        columns.map((col) => (
+          <th class={col.no ? 'c-no' : col.nowrap ? 'c-nowrap' : undefined}>
+            {col.label}
+          </th>
+        ))
+      }
+    </tr>
+  </thead>
+  <tbody>
+    {
+      rows.map((row) => (
+        <tr>
+          {
+            columns.map((col) => (
+              <td class={cellClass(col, row.muted)}>
+                {row.href && col.key === anchorKey ? (
+                  <a href={row.href}>{text(row.cells[col.key])}</a>
+                ) : (
+                  text(row.cells[col.key])
+                )}
+              </td>
+            ))
+          }
+        </tr>
+      ))
+    }
+  </tbody>
+</table>

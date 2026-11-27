@@ -1,0 +1,116 @@
+---
+import { getCollection, getEntry, render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import IndexTable from '../components/IndexTable.astro';
+import type { Column, Row } from '../components/IndexTable.astro';
+
+const home = await getEntry('pages', 'home');
+const { Content } = home ? await render(home) : { Content: null };
+
+const artists = (await getCollection('artists')).sort(
+  (a, b) => a.data.no - b.data.no
+);
+const products = await getCollection('products');
+
+/* 릴리스 · 작업 · 입고를 한 흐름에 섞어 역순으로 쌓는다.
+   e-g-h의 프로젝트 목록과 같은 구조이고, 이 사이트가
+   아카이브처럼 보이는 가장 결정적인 화면이다. */
+type Entry = {
+  year: string;
+  artist: string;
+  title: string;
+  kind: string;
+  href: string;
+  muted?: boolean;
+};
+
+const entries: Entry[] = [];
+
+for (const artist of artists) {
+  for (const work of artist.data.works) {
+    entries.push({
+      year: work.year ?? '',
+      artist: artist.data.name,
+      title: work.title,
+      kind: work.type ?? '',
+      href: `/artist/${artist.id}`,
+    });
+  }
+}
+
+for (const product of products) {
+  entries.push({
+    year: product.data.year ?? '',
+    artist: product.data.artist ?? '',
+    title: product.data.title,
+    kind: 'Shop',
+    href: `/shop/${product.id}`,
+    muted: product.data.status === 'soldout' || product.data.status === 'archived',
+  });
+}
+
+entries.sort((a, b) => (b.year ?? '').localeCompare(a.year ?? ''));
+
+const recentColumns: Column[] = [
+  { key: 'year', label: 'Year', no: true },
+  { key: 'title', label: 'Item' },
+  { key: 'artist', label: 'Artist', nowrap: true },
+  { key: 'kind', label: 'Type', ital: true, dim: true, nowrap: true },
+];
+
+const recentRows: Row[] = entries.map((entry) => ({
+  href: entry.href,
+  muted: entry.muted,
+  cells: {
+    year: entry.year,
+    title: entry.title,
+    artist: entry.artist,
+    kind: entry.kind,
+  },
+}));
+
+const artistColumns: Column[] = [
+  { key: 'no', label: 'No', no: true },
+  { key: 'name', label: 'Artist' },
+  { key: 'roles', label: 'Role', dim: true },
+];
+
+const artistRows: Row[] = artists.map((artist) => ({
+  href: `/artist/${artist.id}`,
+  cells: {
+    no: String(artist.data.no).padStart(2, '0'),
+    name: artist.data.name,
+    roles: artist.data.roles.join(', '),
+  },
+}));
+---
+
+<Base>
+  {
+    home?.data.notice && (
+      <div class="notice meta">{home.data.notice}</div>
+    )
+  }
+
+  {
+    Content && (
+      <div class="block prose">
+        <Content />
+      </div>
+    )
+  }
+
+  {
+    recentRows.length > 0 ? (
+      <section class="block">
+        <span class="label">Recent</span>
+        <IndexTable columns={recentColumns} rows={recentRows} linkKey="title" />
+      </section>
+    ) : (
+      <section class="block">
+        <span class="label">Index</span>
+        <IndexTable columns={artistColumns} rows={artistRows} linkKey="name" />
+      </section>
+    )
+  }
+</Base>
