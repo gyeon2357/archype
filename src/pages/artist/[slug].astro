@@ -32,7 +32,7 @@ const works = (await getCollection('works'))
 
 /* Home의 Recent 표와 같은 비율을 쓴다 */
 const workColumns: Column[] = [
-  { key: 'year', label: 'Year', isNumber: true, sortable: true, width: '12%' },
+  { key: 'year', label: 'Year', isNumber: true, isYear: true, sortable: true, width: '12%' },
   { key: 'title', label: 'Work', sortable: true, width: '38%' },
   { key: 'with', label: 'With', width: '32%' },
   { key: 'type', label: 'Type', isClassifier: true, sortable: true, width: '18%' },
@@ -129,8 +129,9 @@ const workRows: Row[] = works.map((work) => ({
     width: 150px;
   }
 
-  /* 마지막 블록이라 여백이 지워지는데, 페이지 머리와 같은 값으로 되살린다 */
-  .artist-works {
+  /* 마지막 블록이라 전역 규칙이 여백을 지운다.
+     특이도를 올려 페이지 머리와 같은 값으로 되살린다 */
+  .content-block.artist-works {
     margin-bottom: calc(var(--gutter) * 2);
   }
 

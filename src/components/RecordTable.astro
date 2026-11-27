@@ -13,6 +13,8 @@ export interface Column {
   label: string;
   /** 번호 열처럼 작은 라틴 글자로 둘 때 */
   isNumber?: boolean;
+  /** 연도 열. 모바일에서 ’26 꼴로 줄여 보인다 */
+  isYear?: boolean;
   /** 열 너비. table-layout: fixed 라서 이 값이 그대로 적용된다 */
   width?: string;
   /** 분류·장르처럼 성격을 표시하는 열 */
@@ -91,7 +93,9 @@ function cellHref(row: Row, column: Column) {
               const href = cellHref(row, column);
               return (
                 <td class={cellClass(column)}>
-                  {Array.isArray(value) ? (
+                  {column.isYear && typeof value === 'string' && value.length === 4 ? (
+                    <span class="year-short" data-short={`’${value.slice(2)}`}>{value}</span>
+                  ) : Array.isArray(value) ? (
                     value.length === 0 ? (
                       '—'
                     ) : (

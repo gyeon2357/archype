@@ -38,6 +38,7 @@
   --index-width: 200px;
   --gutter: 18px;
   --row-padding: 6px;
+  --table-row-y: 3px; /* 표 행의 위아래 여백 */
   --identity-gap: 22px; /* 워드마크와 인덱스 사이. 본문 정렬 기준이 된다 */
   --tap-size: 30px; /* 모바일 탭 타겟 최소 높이 */
 
@@ -138,6 +139,12 @@ img {
   text-decoration: none !important;
 }
 
+/* 연도는 데스크톱에서 2026, 모바일에서 ’26으로 보인다.
+   글자 자체는 그대로 두고 화면에서만 바꿔 정렬이 어긋나지 않는다 */
+.year-short::before {
+  content: none;
+}
+
 /* 분류·장르처럼 성격을 표시하는 자리 */
 .classifier {
   font-style: italic;
@@ -179,13 +186,13 @@ img {
   text-transform: uppercase;
   letter-spacing: var(--label-tracking);
   text-align: left;
-  padding: 0 1.2em var(--row-padding) 0;
+  padding: 0 1.2em var(--table-row-y) 0;
   border-bottom: 1px solid var(--rule);
   white-space: nowrap;
 }
 
 .record-table td {
-  padding: var(--row-padding) 1.2em var(--row-padding) 0;
+  padding: var(--table-row-y) 1.2em var(--table-row-y) 0;
   border-bottom: 1px solid var(--rule);
   vertical-align: baseline;
   /* 한 줄로 두고 넘치면 말줄임표. 누르면 펼쳐진다 */
@@ -366,5 +373,15 @@ figcaption {
   .record-table th:last-child,
   .record-table td:last-child {
     text-align: right;
+  }
+
+  /* 연도를 ’26 꼴로 줄인다 */
+  .year-short {
+    font-size: 0;
+  }
+
+  .year-short::before {
+    content: attr(data-short);
+    font-size: var(--label-size);
   }
 }
