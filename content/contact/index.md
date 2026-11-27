@@ -1,10 +1,2 @@
----
----
 
-(연락처 안내를 Tina에서 입력하세요.)
-
-협업 및 입점 문의 — (이메일)
-
-프레스 — (이메일)
-
-스튜디오 — (주소)
+[archypeteam@gmail.com](mailto:archypeteam@gmail.com)
