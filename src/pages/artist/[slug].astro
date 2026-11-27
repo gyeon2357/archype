@@ -4,6 +4,7 @@ import Base from '../../layouts/Base.astro';
 import FactList from '../../components/FactList.astro';
 import RecordTable from '../../components/RecordTable.astro';
 import type { Column, Row } from '../../components/RecordTable.astro';
+import { refToSlug, pad } from '../../lib/artists';
 
 export async function getStaticPaths() {
   const artists = await getCollection('artists');
@@ -17,18 +18,36 @@ const { artist } = Astro.props;
 const { Content } = await render(artist);
 const data = artist.data;
 
+/* 이 아티스트가 참여한 작업만 추린다. 협업 작업은 함께한 사람도
+   같이 보여줘야 누가 참여했는지 알 수 있다. */
+const allArtists = await getCollection('artists');
+const nameBySlug = new Map(allArtists.map((entry) => [entry.id, entry.data.name]));
+
+const works = (await getCollection('works'))
+  .filter((work) =>
+    work.data.artists.some((entry) => entry.artist && refToSlug(entry.artist) === artist.id)
+  )
+  .sort((a, b) => (b.data.year ?? '').localeCompare(a.data.year ?? ''));
+
 const workColumns: Column[] = [
-  { key: 'year', label: 'Year', isNumber: true },
-  { key: 'title', label: 'Work' },
-  { key: 'type', label: 'Type', isClassifier: true, noWrap: true },
+  { key: 'year', label: 'Year', isNumber: true, sortable: true },
+  { key: 'title', label: 'Work', sortable: true },
+  { key: 'with', label: 'With' },
+  { key: 'type', label: 'Type', isClassifier: true, noWrap: true, sortable: true },
 ];
 
-const workRows: Row[] = [...data.works]
-  .sort((a, b) => (b.year ?? '').localeCompare(a.year ?? ''))
-  .map((work) => ({
-    href: work.url || undefined,
-    cells: { year: work.year, title: work.title, type: work.type },
-  }));
+const workRows: Row[] = works.map((work) => ({
+  href: work.data.url || undefined,
+  cells: {
+    year: work.data.year,
+    title: work.data.title,
+    with: work.data.artists
+      .map((entry) => (entry.artist ? refToSlug(entry.artist) : ''))
+      .filter((slug) => slug && slug !== artist.id)
+      .map((slug) => ({ text: nameBySlug.get(slug) ?? slug, href: `/artist/${slug}` })),
+    type: work.data.type,
+  },
+}));
 ---
 
 <Base title={data.name}>
@@ -41,7 +60,7 @@ const workRows: Row[] = [...data.works]
     <div class="artist-facts">
       <FactList
         facts={[
-          { label: 'No', value: String(data.no).padStart(2, '0') },
+          { label: 'No', value: pad(data.no) },
           { label: 'Role', value: data.roles.join(', ') },
           { label: 'Genre', value: data.genres.join(', ') },
           { label: 'Since', value: data.since },

@@ -3,8 +3,8 @@
  * 사이트의 단 하나의 목록 조판.
  * Home의 활동 기록과 Artist 색인이 같은 표를 쓴다.
  *
- * 열 머리에 sortable을 주면 눌러서 정렬할 수 있고, 셀마다 따로
- * 링크를 걸 수도 있다. 정렬은 아래 작은 스크립트가 맡는다.
+ * 열 머리에 sortable을 주면 눌러서 정렬할 수 있고, 셀에는 링크를
+ * 하나 또는 여럿 걸 수 있다. 정렬은 아래 작은 스크립트가 맡는다.
  */
 export interface Column {
   /** rows의 cells에서 값을 꺼낼 키 */
@@ -21,12 +21,20 @@ export interface Column {
   sortable?: boolean;
 }
 
+/** 한 셀 안에 여러 링크를 늘어놓을 때 쓴다 (협업 작업의 참여자 등) */
+export interface CellLink {
+  text: string;
+  href?: string;
+}
+
+export type CellValue = string | number | null | undefined | CellLink[];
+
 export interface Row {
   /** 기본 링크. linkKey로 지정한 열에 걸린다 */
   href?: string;
   /** 열마다 다른 링크를 걸 때 — { artist: '/artist/soon' } */
   hrefs?: Record<string, string | undefined>;
-  cells: Record<string, string | number | null | undefined>;
+  cells: Record<string, CellValue>;
 }
 
 interface Props {
@@ -53,7 +61,7 @@ function headClass(column: Column) {
   return undefined;
 }
 
-function cellText(value: string | number | null | undefined) {
+function cellText(value: CellValue) {
   return value === null || value === undefined || value === '' ? '—' : String(value);
 }
 
@@ -86,13 +94,25 @@ function cellHref(row: Row, column: Column) {
         <tr>
           {
             columns.map((column) => {
+              const value = row.cells[column.key];
               const href = cellHref(row, column);
               return (
                 <td class={cellClass(column)}>
-                  {href ? (
-                    <a href={href}>{cellText(row.cells[column.key])}</a>
+                  {Array.isArray(value) ? (
+                    value.length === 0 ? (
+                      '—'
+                    ) : (
+                      value.map((item, index) => (
+                        <>
+                          {index > 0 && ', '}
+                          {item.href ? <a href={item.href}>{item.text}</a> : item.text}
+                        </>
+                      ))
+                    )
+                  ) : href ? (
+                    <a href={href}>{cellText(value)}</a>
                   ) : (
-                    cellText(row.cells[column.key])
+                    cellText(value)
                   )}
                 </td>
               );

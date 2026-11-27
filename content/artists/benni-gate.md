@@ -6,7 +6,6 @@ genres: []
 since: ''
 base: ''
 links: []
-works: []
 profileImage: ''
 profileCaption: ''
 ---

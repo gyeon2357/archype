@@ -37,7 +37,6 @@ export default defineConfig({
             type: 'string',
             isTitle: true,
             required: true,
-            description: '대소문자를 본인 표기 그대로 입력하세요 (ARCHYPE, wnsday, SOON).',
           },
           {
             name: 'no',
@@ -62,27 +61,56 @@ export default defineConfig({
             ],
           },
           {
-            name: 'works',
-            label: '작업',
-            type: 'object',
-            list: true,
-            ui: { itemProps: (item) => ({ label: item?.title }) },
-            fields: [
-              { name: 'title', label: '제목', type: 'string' },
-              { name: 'type', label: '분류', type: 'string' },
-              { name: 'year', label: '연도', type: 'string' },
-              { name: 'url', label: '링크', type: 'string' },
-            ],
-          },
-          {
             name: 'profileImage',
             label: '프로필 이미지',
             type: 'image',
-            description:
-              '인물 사진 한 장. 비워 두면 회색 자리가 보입니다. 지우려면 이미지 옆의 ✕를 누르세요.',
           },
           { name: 'profileCaption', label: '프로필 캡션', type: 'string' },
           { name: 'body', label: '소개', type: 'rich-text', isBody: true },
+        ],
+      },
+
+      /* 작업은 아티스트와 분리해 둔다. 여럿이 함께한 프로젝트를
+         한 문서로 관리하기 위해서다 */
+      {
+        name: 'work',
+        label: 'Work',
+        path: 'content/works',
+        format: 'md',
+        fields: [
+          {
+            name: 'title',
+            label: '제목',
+            type: 'string',
+            isTitle: true,
+            required: true,
+          },
+          {
+            name: 'artists',
+            label: '참여 아티스트',
+            type: 'object',
+            list: true,
+            description:
+              '항목을 추가하고 아티스트를 고르세요. 여럿이면 고른 순서대로 표에 나옵니다.',
+            ui: {
+              itemProps: (item) => ({
+                label: item?.artist
+                  ? String(item.artist).replace(/^.*\/artists\//, '').replace(/\.md$/, '')
+                  : '아티스트',
+              }),
+            },
+            fields: [
+              {
+                name: 'artist',
+                label: '아티스트',
+                type: 'reference',
+                collections: ['artist'],
+              },
+            ],
+          },
+          { name: 'type', label: '분류', type: 'string' },
+          { name: 'year', label: '연도', type: 'string' },
+          { name: 'url', label: '링크', type: 'string' },
         ],
       },
 
@@ -101,8 +129,6 @@ export default defineConfig({
             name: 'image',
             label: '이미지',
             type: 'image',
-            description:
-              'Home 우측 하단에 작게 놓입니다. 비워 두면 회색 자리가 보이고, 지우려면 이미지 옆의 ✕를 누르세요.',
           },
           { name: 'imageCaption', label: '이미지 캡션', type: 'string' },
           { name: 'body', label: '본문', type: 'rich-text', isBody: true },

@@ -22,10 +22,11 @@ Pretendard 서브셋에는 한글 2,780자가 들어 있습니다. 희귀 음절
 
 ```
 content/            Tina가 읽고 쓰는 콘텐츠. git에 그대로 커밋됩니다
-  artists/*.md      아티스트 여덟 명. 유일하게 목록으로 다루는 컬렉션
-  home/index.md     Home 공지와 이미지
+  artists/*.md      아티스트 여덟 명
+  works/*.md        작업. 참여 아티스트를 참조로 연결합니다
+  home/index.md     Home 이미지
   contact/index.md  Contact 본문
-  settings/*.json   Shop 링크, SNS 링크, 사이트 설명
+  settings/*.json   공지, Shop 링크, SNS 링크, 사이트 설명
 src/
   layouts/Base.astro          2열 2행 격자. 1행은 사이트 이름, 2행은 메뉴와 본문
   components/
@@ -54,7 +55,13 @@ tina/tina-lock.json           TinaCloud가 브랜치를 색인하는 데 쓰는 
 
 ## CMS 구조
 
-Tina 사이드바에서 아티스트만 목록으로 다루고, Home·Contact·Settings는 문서 하나짜리라 **Site** 아래에 지구본 아이콘으로 놓여 목록을 거치지 않고 바로 열립니다. `ui.global: true`로 지정한 결과이고 tinacms 3.9.4 이상에서 동작합니다. 문서가 없거나 둘 이상이면 일반 목록으로 되돌아가니, 각 폴더에 파일을 하나만 두세요.
+Tina 사이드바에서 Artist와 Work를 목록으로 다루고, Home·Contact·Settings는 문서 하나짜리라 **Site** 아래에 지구본 아이콘으로 놓여 목록을 거치지 않고 바로 열립니다.
+
+### 작업과 아티스트의 관계
+
+작업은 아티스트 문서 안이 아니라 별도 컬렉션에 둡니다. 여럿이 함께한 프로젝트를 문서 하나로 관리하기 위해서입니다. 작업 문서의 `참여 아티스트`에 항목을 추가하고 아티스트를 고르면, Home 표에는 그 작업이 한 줄만 올라가면서 참여자가 모두 링크로 나오고, 각 아티스트 상세의 Works 표에도 함께 나타납니다. 상세의 `With` 열에는 자기를 뺀 나머지 참여자가 놓입니다.
+
+Tina의 `reference` 필드는 `list: true`를 지원하지 않아서, 객체 목록 안에 참조를 하나씩 두는 구조로 만들었습니다. 저장되는 값은 `artists: [{ artist: content/artists/soon.md }]` 형태이고, 사이트 쪽에서는 `src/lib/artists.ts`의 `refToSlug`가 경로를 슬러그로 바꿉니다. `ui.global: true`로 지정한 결과이고 tinacms 3.9.4 이상에서 동작합니다. 문서가 없거나 둘 이상이면 일반 목록으로 되돌아가니, 각 폴더에 파일을 하나만 두세요.
 
 사이트 이름은 CMS에서 빼고 `src/site.ts`의 `SITE_NAME` 상수로 두었습니다.
 

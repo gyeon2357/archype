@@ -3,6 +3,7 @@ import { getCollection, getEntry, render } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import RecordTable from '../components/RecordTable.astro';
 import type { Column, Row } from '../components/RecordTable.astro';
+import { refToSlug, pad } from '../lib/artists';
 
 const home = await getEntry('home', 'index');
 const { Content } = home ? await render(home) : { Content: null };
@@ -10,31 +11,35 @@ const { Content } = home ? await render(home) : { Content: null };
 const artists = (await getCollection('artists')).sort(
   (a, b) => a.data.no - b.data.no
 );
+const works = await getCollection('works');
 
-/* 아티스트들의 작업을 한 흐름에 모아 연도 역순으로 쌓는다.
-   아직 작업이 없으면 아티스트 색인으로 대체한다. */
-const activityRows: Row[] = artists
-  .flatMap((artist) =>
-    artist.data.works.map((work) => ({
-      href: `/artist/${artist.id}`,
-      hrefs: {
-        /* 아티스트 이름을 눌러도 그 아티스트의 상세로 간다 */
-        artist: `/artist/${artist.id}`,
-      },
-      cells: {
-        year: work.year ?? '',
-        title: work.title,
-        artist: artist.data.name,
-        type: work.type ?? '',
-      },
-    }))
-  )
-  .sort((a, b) => String(b.cells.year).localeCompare(String(a.cells.year)));
+/* 아티스트 슬러그로 이름을 찾기 위한 색인 */
+const nameBySlug = new Map(artists.map((artist) => [artist.id, artist.data.name]));
+
+/* 작업을 연도 역순으로 쌓는다. 협업 작업도 한 줄로만 올라가고
+   참여 아티스트가 모두 링크로 나온다. */
+const activityRows: Row[] = [...works]
+  .sort((a, b) => (b.data.year ?? '').localeCompare(a.data.year ?? ''))
+  .map((work) => ({
+    href: work.data.url || undefined,
+    cells: {
+      year: work.data.year ?? '',
+      title: work.data.title,
+      artist: work.data.artists
+        .map((entry) => entry.artist)
+        .filter((reference): reference is string => Boolean(reference))
+        .map((reference) => {
+          const slug = refToSlug(reference);
+          return { text: nameBySlug.get(slug) ?? slug, href: `/artist/${slug}` };
+        }),
+      type: work.data.type ?? '',
+    },
+  }));
 
 const activityColumns: Column[] = [
   { key: 'year', label: 'Year', isNumber: true, sortable: true },
   { key: 'title', label: 'Item', sortable: true },
-  { key: 'artist', label: 'Artist', noWrap: true },
+  { key: 'artist', label: 'Artist' },
   { key: 'type', label: 'Type', isClassifier: true, noWrap: true, sortable: true },
 ];
 
@@ -47,7 +52,7 @@ const artistColumns: Column[] = [
 const artistRows: Row[] = artists.map((artist) => ({
   href: `/artist/${artist.id}`,
   cells: {
-    no: String(artist.data.no).padStart(2, '0'),
+    no: pad(artist.data.no),
     name: artist.data.name,
     roles: artist.data.roles.join(', '),
   },

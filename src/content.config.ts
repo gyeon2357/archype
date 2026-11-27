@@ -16,19 +16,26 @@ const artists = defineCollection({
     since: z.string().optional(),
     base: z.string().optional(),
     links: z.array(link).default([]),
-    works: z
-      .array(
-        z.object({
-          title: z.string(),
-          type: z.string().optional(),
-          year: z.string().optional(),
-          url: z.string().optional(),
-        })
-      )
-      .default([]),
     /** 인물 사진 한 장 */
     profileImage: z.string().optional(),
     profileCaption: z.string().optional(),
+  }),
+});
+
+/* 작업은 아티스트와 분리해 둔다. 여럿이 함께한 프로젝트를 한 문서로
+   관리하기 위해서다. Tina의 reference는 목록을 지원하지 않아 객체
+   목록 안에 참조를 하나씩 둔다. 값은 파일 경로다
+   (예: content/artists/soon.md). */
+const works = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './content/works' }),
+  schema: z.object({
+    title: z.string(),
+    artists: z
+      .array(z.object({ artist: z.string().optional() }))
+      .default([]),
+    type: z.string().optional(),
+    year: z.string().optional(),
+    url: z.string().optional(),
   }),
 });
 
@@ -51,4 +58,4 @@ const contact = defineCollection({
   }),
 });
 
-export const collections = { artists, home, contact };
+export const collections = { artists, works, home, contact };

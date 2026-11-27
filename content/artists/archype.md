@@ -6,11 +6,6 @@ genres: []
 since: ''
 base: ''
 links: []
-works:
-  - title: '(작업 제목)'
-    type: '(분류)'
-    year: '2026'
-    url: ''
 profileImage: ''
 profileCaption: ''
 ---
