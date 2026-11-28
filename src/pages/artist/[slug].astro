@@ -33,7 +33,7 @@ const works = (await getCollection('works'))
 /* Home의 Recent 표와 같은 비율을 쓴다 */
 const workColumns: Column[] = [
   { key: 'year', label: 'Year', isNumber: true, isYear: true, sortable: true, width: '16%' },
-  { key: 'title', label: 'Work', sortable: true, width: '38%' },
+  { key: 'title', label: 'Title', sortable: true, width: '38%' },
   { key: 'with', label: 'With', width: '28%' },
   { key: 'type', label: 'Type', isClassifier: true, sortable: true, width: '18%' },
 ];
