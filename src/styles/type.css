@@ -281,9 +281,12 @@ img {
   margin-bottom: 0;
 }
 
+/* 블록 머리의 라벨. 페이지 제목이 쓰는 여백(gutter 2배)의 절반을 둔다.
+   라벨과 표가 같은 크기·같은 대문자라서, 이 간격이 없으면 라벨이
+   표의 또 다른 머리글처럼 붙어 읽힌다. */
 .content-block > .section-label {
   display: block;
-  margin-bottom: var(--row-padding);
+  margin-bottom: var(--gutter);
 }
 
 /* 모든 페이지의 첫 줄을 담는 머리 블록.
